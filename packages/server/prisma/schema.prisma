@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATIENT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  NO_SHOW
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  CONVERTED
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE_FORM
+  CALLBACK_REQUEST
+  PHONE_INQUIRY
+  WALK_IN
+  REFERRAL
+  SOCIAL_MEDIA
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?   @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          Role      @default(PATIENT)
+  avatar        String?
+  dateOfBirth   DateTime?
+  gender        String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  isActive      Boolean   @default(true)
+  isVerified    Boolean   @default(false)
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  appointments  Appointment[]
+  leads         Lead[]
+
+  @@map("users")
+}
+
+model Branch {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  address     String
+  city        String
+  state       String
+  pincode     String
+  phone       String
+  email       String?
+  latitude    Float?
+  longitude   Float?
+  openingTime String   @default("09:00")
+  closingTime String   @default("20:00")
+  isActive    Boolean  @default(true)
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointments Appointment[]
+  services     BranchService[]
+
+  @@map("branches")
+}
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  services    Service[]
+
+  @@map("service_categories")
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String
+  shortDesc     String?
+  duration      Int      
+  price         Float
+  discountPrice Float?
+  image         String?
+  benefits      String[] 
+  isPopular     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  categoryId    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category      ServiceCategory @relation(fields: [categoryId], references: [id])
+  appointments  Appointment[]
+  branches      BranchService[]
+
+  @@map("services")
+}
+
+model BranchService {
+  id        String  @id @default(cuid())
+  branchId  String
+  serviceId String
+  isActive  Boolean @default(true)
+
+  branch  Branch  @relation(fields: [branchId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@unique([branchId, serviceId])
+  @@map("branch_services")
+}
+
+model Appointment {
+  id              String            @id @default(cuid())
+  appointmentDate DateTime
+  timeSlot        String            
+  status          AppointmentStatus @default(PENDING)
+  notes           String?
+  patientName     String
+  patientPhone    String
+  patientEmail    String?
+  userId          String?
+  serviceId       String
+  branchId        String
+  adminNotes      String?
+  cancelReason    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user    User?   @relation(fields: [userId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+  branch  Branch  @relation(fields: [branchId], references: [id])
+
+  @@map("appointments")
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  name            String
+  email           String?
+  phone           String
+  message         String?
+  serviceInterest String?
+  source          LeadSource @default(WEBSITE_FORM)
+  status          LeadStatus @default(NEW)
+  assignedTo      String?
+  notes           String?
+  followUpDate    DateTime?
+  userId          String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("leads")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
