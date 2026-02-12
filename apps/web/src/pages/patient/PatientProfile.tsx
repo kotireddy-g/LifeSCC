@@ -112,7 +112,7 @@ export default function PatientProfile() {
             <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
                 {/* Page Header */}
                 <div className="mb-8 animate-fade-in">
-                    <h1 className="font-['Poppins'] text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                         My Profile
                     </h1>
                     <p className="text-gray-600 text-lg">
@@ -134,7 +134,7 @@ export default function PatientProfile() {
                                 </div>
                             </div>
                             <div className="flex-1">
-                                <h2 className="font-['Poppins'] text-3xl font-bold text-gray-900 mb-1">
+                                <h2 className="text-3xl font-bold text-gray-900 mb-1">
                                     {user?.firstName} {user?.lastName}
                                 </h2>
                                 <p className="text-gray-600 mb-3 flex items-center gap-2">
@@ -164,7 +164,7 @@ export default function PatientProfile() {
                     <CardContent className="p-8">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="font-['Poppins'] text-2xl font-bold text-gray-900 mb-1">Personal Information</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-1">Personal Information</h3>
                                 <p className="text-gray-600">Update your personal details</p>
                             </div>
                             {!isEditing && (
@@ -289,7 +289,7 @@ export default function PatientProfile() {
 
                                 {/* Address Section */}
                                 <div className="pt-4 border-t border-gray-100">
-                                    <h4 className="font-['Poppins'] text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                         <MapPin className="h-5 w-5 text-violet-600" />
                                         Address Information
                                     </h4>

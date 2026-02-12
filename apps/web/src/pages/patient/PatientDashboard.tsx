@@ -214,7 +214,7 @@ export default function PatientDashboard() {
                                     <div className={`inline-flex p-4 rounded-2xl ${action.iconBg} mb-6 group-hover:scale-110 transition-transform duration-300`}>
                                         <action.icon className={`w-8 h-8 ${action.iconColor}`} />
                                     </div>
-                                    <h3 className="font-['Poppins'] text-2xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
+                                    <h3 className="text-2xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
                                         {action.title}
                                     </h3>
                                     <p className="text-gray-600 mb-4">
@@ -279,7 +279,7 @@ export default function PatientDashboard() {
                                                 <Calendar className="w-10 h-10" />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-['Poppins'] text-xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
+                                                <h4 className="text-xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
                                                     {appointment.service?.name}
                                                 </h4>
                                                 <div className="space-y-2 text-gray-600">

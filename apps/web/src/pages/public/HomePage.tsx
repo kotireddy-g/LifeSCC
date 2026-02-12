@@ -217,8 +217,8 @@ export default function HomePage() {
                                                     key={index}
                                                     onClick={() => setCurrentImageIndex(index)}
                                                     className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
-                                                            ? 'bg-white w-6'
-                                                            : 'bg-white/50 hover:bg-white/75'
+                                                        ? 'bg-white w-6'
+                                                        : 'bg-white/50 hover:bg-white/75'
                                                         }`}
                                                     aria-label={`Go to image ${index + 1}`}
                                                 />
@@ -285,7 +285,7 @@ export default function HomePage() {
                                     <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.color} mb-6`}>
                                         <feature.icon className="w-8 h-8 text-white" />
                                     </div>
-                                    <h3 className="font-['Poppins'] text-2xl font-semibold mb-3 text-gray-900">
+                                    <h3 className="text-2xl font-semibold mb-3 text-gray-900">
                                         {feature.title}
                                     </h3>
                                     <p className="text-gray-600 leading-relaxed">
@@ -335,7 +335,7 @@ export default function HomePage() {
                                         {service.category}
                                     </div>
 
-                                    <h3 className="font-['Poppins'] text-2xl font-semibold mb-3 text-gray-900">
+                                    <h3 className="text-2xl font-semibold mb-3 text-gray-900">
                                         {service.name}
                                     </h3>
 

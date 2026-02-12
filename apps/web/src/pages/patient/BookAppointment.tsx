@@ -164,7 +164,7 @@ export default function BookAppointment() {
             {/* Header */}
             <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link to="/patient/dashboard" className="text-2xl font-bold font-['Poppins'] bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                    <Link to="/patient/dashboard" className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                         LifeSCC
                     </Link>
                     <div className="flex items-center gap-4">
@@ -182,7 +182,7 @@ export default function BookAppointment() {
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 {/* Page Header */}
                 <div className="mb-8 animate-fade-in">
-                    <h1 className="text-4xl md:text-5xl font-bold font-['Poppins'] bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-3">
+                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-3">
                         Book Appointment
                     </h1>
                     <p className="text-gray-600 text-lg">Follow the steps to schedule your treatment</p>
@@ -196,8 +196,8 @@ export default function BookAppointment() {
                                 <div className="flex flex-col items-center">
                                     <div
                                         className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 ${index <= currentStep
-                                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-200 scale-110'
-                                                : 'bg-gray-100 text-gray-400'
+                                            ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-200 scale-110'
+                                            : 'bg-gray-100 text-gray-400'
                                             }`}
                                     >
                                         {index < currentStep ? <Check className="h-5 w-5" /> : index + 1}
@@ -225,7 +225,7 @@ export default function BookAppointment() {
                     <div className="h-1.5 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
 
                     <CardHeader className="pb-6">
-                        <CardTitle className="text-2xl font-['Poppins'] flex items-center gap-2">
+                        <CardTitle className="text-2xl flex items-center gap-2">
                             <Sparkles className="h-6 w-6 text-violet-600" />
                             {STEPS[currentStep]}
                         </CardTitle>
@@ -239,8 +239,8 @@ export default function BookAppointment() {
                                     <Card
                                         key={service.id}
                                         className={`cursor-pointer transition-all duration-300 hover-lift bg-white/90 backdrop-blur border-l-4 ${selectedService?.id === service.id
-                                                ? 'border-l-violet-600 ring-2 ring-violet-200 shadow-lg'
-                                                : 'border-l-gray-200 hover:border-l-violet-400'
+                                            ? 'border-l-violet-600 ring-2 ring-violet-200 shadow-lg'
+                                            : 'border-l-gray-200 hover:border-l-violet-400'
                                             }`}
                                         onClick={() => setSelectedService(service)}
                                     >
@@ -275,8 +275,8 @@ export default function BookAppointment() {
                                     <Card
                                         key={branch.id}
                                         className={`cursor-pointer transition-all duration-300 hover-lift bg-white/90 backdrop-blur border-l-4 ${selectedBranch?.id === branch.id
-                                                ? 'border-l-violet-600 ring-2 ring-violet-200 shadow-lg'
-                                                : 'border-l-gray-200 hover:border-l-violet-400'
+                                            ? 'border-l-violet-600 ring-2 ring-violet-200 shadow-lg'
+                                            : 'border-l-gray-200 hover:border-l-violet-400'
                                             }`}
                                         onClick={() => setSelectedBranch(branch)}
                                     >
@@ -359,8 +359,8 @@ export default function BookAppointment() {
                                                         variant={selectedTimeSlot === slot ? 'default' : 'outline'}
                                                         onClick={() => setSelectedTimeSlot(slot)}
                                                         className={`w-full transition-all duration-300 ${selectedTimeSlot === slot
-                                                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200 scale-105'
-                                                                : 'hover:border-violet-400 hover:text-violet-600'
+                                                            ? 'bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200 scale-105'
+                                                            : 'hover:border-violet-400 hover:text-violet-600'
                                                             }`}
                                                     >
                                                         {slot}

@@ -67,7 +67,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-['Inter'] antialiased;
+    @apply bg-background text-foreground antialiased;
   }
 
   h1,
@@ -76,7 +76,7 @@
   h4,
   h5,
   h6 {
-    @apply font-['Playfair_Display'] font-semibold;
+    @apply font-semibold;
   }
 
   /* Smooth focus states */

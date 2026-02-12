@@ -151,7 +151,7 @@ export default function MyAppointments() {
                 {/* Header Section */}
                 <div className="flex items-center justify-between mb-8 animate-fade-in">
                     <div>
-                        <h1 className="font-['Poppins'] text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                             My Appointments
                         </h1>
                         <p className="text-gray-600 text-lg">
@@ -209,7 +209,7 @@ export default function MyAppointments() {
                             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center">
                                 <Calendar className="h-10 w-10 text-violet-600" />
                             </div>
-                            <h3 className="font-['Poppins'] text-2xl font-semibold mb-3 text-gray-900">No appointments found</h3>
+                            <h3 className="text-2xl font-semibold mb-3 text-gray-900">No appointments found</h3>
                             <p className="text-gray-600 mb-8 text-lg">
                                 {selectedStatus === 'all'
                                     ? "You haven't booked any appointments yet"
@@ -241,7 +241,7 @@ export default function MyAppointments() {
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-4">
-                                                    <h3 className="font-['Poppins'] text-xl font-semibold text-gray-900">
+                                                    <h3 className="text-xl font-semibold text-gray-900">
                                                         {appointment.service?.name}
                                                     </h3>
                                                     <span

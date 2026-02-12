@@ -315,13 +315,13 @@ export default function AdminDashboard() {
                                 <Card className="hover-lift border-0 shadow-soft bg-white h-full">
                                     <CardContent className="p-8">
                                         <div className={`inline-flex p-4 rounded-2xl ${action.color === 'violet' ? 'bg-violet-100' :
-                                                action.color === 'rose' ? 'bg-rose-100' : 'bg-teal-100'
+                                            action.color === 'rose' ? 'bg-rose-100' : 'bg-teal-100'
                                             } mb-6 group-hover:scale-110 transition-transform duration-300`}>
                                             <action.icon className={`w-8 h-8 ${action.color === 'violet' ? 'text-violet-600' :
-                                                    action.color === 'rose' ? 'text-rose-600' : 'text-teal-600'
+                                                action.color === 'rose' ? 'text-rose-600' : 'text-teal-600'
                                                 }`} />
                                         </div>
-                                        <h3 className="font-['Poppins'] text-2xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
+                                        <h3 className="text-2xl font-semibold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
                                             {action.title}
                                         </h3>
                                         <p className="text-gray-600 mb-4">

@@ -144,7 +144,7 @@ export default function ServicesPage() {
                 {/* Category Filter */}
                 <div className="mb-12 animate-fade-in">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="font-['Poppins'] text-2xl font-semibold flex items-center gap-2">
+                        <h2 className="text-2xl font-semibold flex items-center gap-2">
                             <Filter className="w-6 h-6 text-violet-600" />
                             Filter by Category
                         </h2>
@@ -223,7 +223,7 @@ export default function ServicesPage() {
 
                                 {/* Service Content */}
                                 <div className="p-6">
-                                    <h3 className="font-['Poppins'] text-2xl font-semibold mb-3 text-gray-900 group-hover:text-violet-600 transition-colors">
+                                    <h3 className="text-2xl font-semibold mb-3 text-gray-900 group-hover:text-violet-600 transition-colors">
                                         {service.name}
                                     </h3>
 
