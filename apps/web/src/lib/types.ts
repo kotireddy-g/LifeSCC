@@ -136,3 +136,46 @@ export interface DashboardStats {
     appointmentsByStatus: Array<{ status: string; count: number }>;
     leadsByStatus: Array<{ status: string; count: number }>;
 }
+
+// Lead Constants
+export const LEAD_STATUS = {
+    NEW: 'NEW',
+    CONTACTED: 'CONTACTED',
+    INTERESTED: 'INTERESTED',
+    CONVERTED: 'CONVERTED',
+    LOST: 'LOST'
+} as const;
+
+export const LEAD_STATUS_LABELS: Record<string, string> = {
+    NEW: 'New',
+    CONTACTED: 'Contacted',
+    INTERESTED: 'Interested',
+    CONVERTED: 'Converted',
+    LOST: 'Lost'
+};
+
+export const LEAD_STATUS_COLORS: Record<string, string> = {
+    NEW: 'bg-blue-100 text-blue-800',
+    CONTACTED: 'bg-yellow-100 text-yellow-800',
+    INTERESTED: 'bg-purple-100 text-purple-800',
+    CONVERTED: 'bg-green-100 text-green-800',
+    LOST: 'bg-gray-100 text-gray-800'
+};
+
+export const LEAD_SOURCE = {
+    WEBSITE_FORM: 'WEBSITE_FORM',
+    CALLBACK_REQUEST: 'CALLBACK_REQUEST',
+    PHONE_INQUIRY: 'PHONE_INQUIRY',
+    WALK_IN: 'WALK_IN',
+    REFERRAL: 'REFERRAL',
+    SOCIAL_MEDIA: 'SOCIAL_MEDIA'
+} as const;
+
+export const LEAD_SOURCE_LABELS: Record<string, string> = {
+    WEBSITE_FORM: 'Website Form',
+    CALLBACK_REQUEST: 'Callback Request',
+    PHONE_INQUIRY: 'Phone Inquiry',
+    WALK_IN: 'Walk-in',
+    REFERRAL: 'Referral',
+    SOCIAL_MEDIA: 'Social Media'
+};
