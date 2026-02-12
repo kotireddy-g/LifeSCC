@@ -284,6 +284,7 @@ async function main() {
                 duration: 60,
                 price: 25000,
                 discountPrice: 22000,
+                image: 'https://www.lifescc.com/img/cools1.jpeg',
                 benefits: [
                     'No surgery, needles, or downtime',
                     'FDA-approved and clinically proven',
@@ -304,6 +305,7 @@ async function main() {
                 duration: 45,
                 price: 8000,
                 discountPrice: 6500,
+                image: 'https://www.lifescc.com/img/t3.png',
                 benefits: [
                     'Non-invasive fat reduction',
                     'Reduces cellulite appearance',
@@ -324,6 +326,7 @@ async function main() {
                 duration: 90,
                 price: 12000,
                 discountPrice: 10000,
+                image: 'https://www.lifescc.com/img/t6.png',
                 benefits: [
                     'Visible inch loss in first session',
                     'Improves skin texture and tone',
@@ -344,6 +347,7 @@ async function main() {
                 duration: 60,
                 price: 15000,
                 discountPrice: 13500,
+                image: 'https://www.lifescc.com/img/t1.png',
                 benefits: [
                     'Tightens loose skin',
                     'Reduces localized fat',
@@ -363,6 +367,7 @@ async function main() {
                 shortDesc: 'Expert nutritional guidance for sustainable weight management',
                 duration: 30,
                 price: 2000,
+                image: 'https://www.lifescc.com/img/loss.jpg',
                 benefits: [
                     'Personalized meal plans',
                     'Body composition analysis',
@@ -385,6 +390,7 @@ async function main() {
                 duration: 60,
                 price: 8000,
                 discountPrice: 7000,
+                image: 'https://www.lifescc.com/img/scul1.jpg',
                 benefits: [
                     'Deep cleansing and exfoliation',
                     'Painless extractions',
@@ -405,6 +411,7 @@ async function main() {
                 duration: 45,
                 price: 5000,
                 discountPrice: 4500,
+                image: 'https://www.lifescc.com/img/scul2.jpg',
                 benefits: [
                     'Reduces acne and scars',
                     'Lightens pigmentation',
@@ -418,21 +425,22 @@ async function main() {
         }),
         prisma.service.create({
             data: {
-                name: 'Laser Skin Resurfacing',
-                slug: 'laser-skin-resurfacing',
-                description: 'Advanced fractional CO2 laser treatment for acne scars, wrinkles, and skin texture improvement. Gold standard for skin rejuvenation.',
-                shortDesc: 'Fractional laser for scars and wrinkles',
-                duration: 75,
-                price: 18000,
-                discountPrice: 16000,
+                name: 'Laser Hair Removal',
+                slug: 'laser-hair-removal',
+                description: 'Advanced laser technology for permanent hair reduction. Safe, effective treatment for all skin types with minimal discomfort.',
+                shortDesc: 'Permanent hair reduction with laser technology',
+                duration: 45,
+                price: 6000,
+                discountPrice: 5500,
+                image: 'https://www.lifescc.com/img/scul2.jpg',
                 benefits: [
-                    'Dramatically reduces acne scars',
-                    'Minimizes wrinkles and fine lines',
-                    'Improves skin texture and tone',
-                    'Tightens sagging skin',
-                    'Long-lasting results'
+                    'Permanent hair reduction',
+                    'Suitable for all skin types',
+                    'Minimal discomfort',
+                    'Quick treatment sessions',
+                    'Smooth, hair-free skin'
                 ],
-                isPopular: false,
+                isPopular: true,
                 categoryId: categories[1].id
             }
         }),
@@ -445,6 +453,7 @@ async function main() {
                 duration: 60,
                 price: 35000,
                 discountPrice: 32000,
+                image: 'https://www.lifescc.com/img/scul3.jpg',
                 benefits: [
                     'Reduces wrinkles and fine lines',
                     'Restores facial volume',
@@ -458,19 +467,20 @@ async function main() {
         }),
         prisma.service.create({
             data: {
-                name: 'Acne Scar Removal',
-                slug: 'acne-scar-removal',
-                description: 'Specialized treatment combining multiple modalities - laser, microneedling, and chemical peels - for effective acne scar reduction.',
-                shortDesc: 'Advanced multi-modal acne scar treatment',
+                name: 'Stretch Marks Treatment',
+                slug: 'stretch-marks-treatment',
+                description: 'Advanced treatment combining laser therapy and microneedling to reduce the appearance of stretch marks. Effective for both old and new stretch marks.',
+                shortDesc: 'Reduce stretch marks with advanced technology',
                 duration: 60,
-                price: 12000,
-                discountPrice: 10500,
+                price: 10000,
+                discountPrice: 9000,
+                image: 'https://www.lifescc.com/img/scul4.jpg',
                 benefits: [
-                    'Visible scar reduction',
+                    'Reduces stretch mark appearance',
                     'Improves skin texture',
-                    'Minimal downtime',
-                    'Safe for all skin types',
-                    'Combination therapy for best results'
+                    'Boosts collagen production',
+                    'Works on old and new marks',
+                    'Safe and effective'
                 ],
                 isPopular: false,
                 categoryId: categories[1].id
@@ -480,13 +490,14 @@ async function main() {
         // Hair Care Services
         prisma.service.create({
             data: {
-                name: 'PRP Hair Therapy',
-                slug: 'prp-hair-therapy',
-                description: 'Platelet-Rich Plasma therapy uses your own blood to stimulate hair growth. Natural, safe, and effective treatment for hair loss and thinning.',
-                shortDesc: 'Natural hair regrowth using your own blood platelets',
+                name: 'Hair Regrowth Therapy',
+                slug: 'hair-regrowth-therapy',
+                description: 'Advanced hair regrowth treatment combining PRP, mesotherapy, and laser therapy. Comprehensive solution for hair loss and thinning.',
+                shortDesc: 'Complete hair regrowth solution',
                 duration: 60,
                 price: 10000,
                 discountPrice: 9000,
+                image: 'https://www.lifescc.com/img/home.jpg',
                 benefits: [
                     'Stimulates natural hair growth',
                     'Reduces hair fall',
@@ -500,38 +511,41 @@ async function main() {
         }),
         prisma.service.create({
             data: {
-                name: 'Hair Transplant Consultation',
-                slug: 'hair-transplant-consultation',
-                description: 'Comprehensive hair transplant evaluation by expert surgeons. Includes scalp analysis, graft calculation, and personalized treatment planning.',
-                shortDesc: 'Expert consultation for hair restoration surgery',
-                duration: 45,
-                price: 2000,
+                name: 'Hair Transplantation',
+                slug: 'hair-transplantation',
+                description: 'Advanced FUE hair transplant by expert surgeons. Permanent solution for baldness with natural-looking results.',
+                shortDesc: 'Permanent hair restoration surgery',
+                duration: 240,
+                price: 80000,
+                discountPrice: 75000,
+                image: 'https://www.lifescc.com/img/home3.jpg',
                 benefits: [
-                    'Detailed scalp analysis',
-                    'Graft requirement calculation',
-                    'Personalized treatment plan',
-                    'Cost estimation',
-                    'Pre and post-care guidance'
+                    'Permanent hair restoration',
+                    'Natural-looking results',
+                    'Minimal scarring',
+                    'Expert surgeons',
+                    'Long-lasting solution'
                 ],
-                isPopular: false,
+                isPopular: true,
                 categoryId: categories[2].id
             }
         }),
         prisma.service.create({
             data: {
-                name: 'Laser Hair Regrowth',
-                slug: 'laser-hair-regrowth',
-                description: 'Low-Level Laser Therapy (LLLT) stimulates hair follicles and promotes hair growth. FDA-approved treatment for pattern baldness.',
-                shortDesc: 'FDA-approved laser therapy for hair regrowth',
-                duration: 30,
-                price: 6000,
-                discountPrice: 5500,
+                name: 'Anti Dandruff Treatment',
+                slug: 'anti-dandruff-treatment',
+                description: 'Specialized scalp treatment to eliminate dandruff and soothe irritated scalp. Combines medical therapy with deep cleansing.',
+                shortDesc: 'Complete dandruff elimination treatment',
+                duration: 45,
+                price: 4000,
+                discountPrice: 3500,
+                image: 'https://www.lifescc.com/img/home2.jpg',
                 benefits: [
-                    'Stimulates hair follicles',
-                    'Increases hair density',
-                    'Improves hair quality',
-                    'Painless and non-invasive',
-                    'No side effects'
+                    'Eliminates dandruff completely',
+                    'Soothes scalp irritation',
+                    'Reduces itching and flaking',
+                    'Improves scalp health',
+                    'Long-lasting results'
                 ],
                 isPopular: false,
                 categoryId: categories[2].id
@@ -546,6 +560,7 @@ async function main() {
                 duration: 45,
                 price: 7500,
                 discountPrice: 6800,
+                image: 'https://www.lifescc.com/img/home1.jpg',
                 benefits: [
                     'Nourishes hair follicles',
                     'Strengthens hair roots',
@@ -559,19 +574,20 @@ async function main() {
         }),
         prisma.service.create({
             data: {
-                name: 'GFC Hair Treatment',
-                slug: 'gfc-hair-treatment',
-                description: 'Growth Factor Concentrate therapy - the next generation of PRP. More concentrated growth factors for superior hair regrowth results.',
-                shortDesc: 'Advanced growth factor therapy for hair restoration',
-                duration: 60,
-                price: 15000,
-                discountPrice: 13500,
+                name: 'Non-Surgical Hair Replacement',
+                slug: 'non-surgical-hair-replacement',
+                description: 'Advanced hair replacement system using premium quality hair. Natural-looking solution for complete baldness without surgery.',
+                shortDesc: 'Natural-looking hair replacement without surgery',
+                duration: 120,
+                price: 40000,
+                discountPrice: 35000,
+                image: 'https://www.lifescc.com/img/home4.jpg',
                 benefits: [
-                    '3x more growth factors than PRP',
-                    'Faster and better results',
-                    'Promotes thick hair growth',
-                    'Reduces hair thinning',
-                    'Scientifically proven'
+                    'Instant full head of hair',
+                    'Natural appearance',
+                    'Non-surgical solution',
+                    'Customized to match your hair',
+                    'Maintenance and styling support'
                 ],
                 isPopular: false,
                 categoryId: categories[2].id

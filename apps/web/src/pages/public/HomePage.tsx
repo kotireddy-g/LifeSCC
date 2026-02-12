@@ -43,7 +43,7 @@ export default function HomePage() {
             price: 15000,
             discountPrice: 12000,
             isPopular: true,
-            icon: '⚖️'
+            image: 'https://www.lifescc.com/img/t6.png'
         },
         {
             name: 'Skin Rejuvenation',
@@ -51,7 +51,7 @@ export default function HomePage() {
             duration: '45 min',
             price: 8000,
             isPopular: true,
-            icon: '✨'
+            image: 'https://www.lifescc.com/img/scul3.jpg'
         },
         {
             name: 'Hair Restoration',
@@ -59,9 +59,10 @@ export default function HomePage() {
             duration: '90 min',
             price: 20000,
             discountPrice: 18000,
-            icon: '💇'
+            image: 'https://www.lifescc.com/img/home.jpg'
         }
     ];
+
 
     return (
         <div className="min-h-screen bg-background">
@@ -264,7 +265,13 @@ export default function HomePage() {
                                 {/* Service Content */}
                                 <div className="p-8">
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="text-5xl">{service.icon}</div>
+                                        <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-md">
+                                            <img
+                                                src={service.image}
+                                                alt={service.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
                                         {service.isPopular && (
                                             <div className="gradient-secondary px-3 py-1 rounded-full flex items-center gap-1">
                                                 <Star className="w-3 h-3 text-white fill-current" />
@@ -319,7 +326,10 @@ export default function HomePage() {
 
                     <div className="text-center mt-12">
                         <Link to="/services">
-                            <Button className="btn-secondary text-lg px-10 py-6">
+                            <Button
+                                size="lg"
+                                className="bg-white text-violet-600 hover:bg-gray-50 border-2 border-violet-200 hover:border-violet-300 px-10 py-6 text-lg rounded-xl font-semibold shadow-soft hover-lift transition-all duration-300"
+                            >
                                 View All Services
                                 <ChevronRight className="w-5 h-5" />
                             </Button>

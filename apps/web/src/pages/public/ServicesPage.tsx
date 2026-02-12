@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
     Sparkles, Search, Filter, Clock, ChevronRight, Star,
@@ -193,9 +193,19 @@ export default function ServicesPage() {
                                 className="group relative bg-white rounded-2xl overflow-hidden shadow-soft hover-lift animate-fade-in"
                                 style={{ animationDelay: `${(index % 6) * 0.1}s` }}
                             >
-                                {/* Service Image Placeholder */}
-                                <div className="relative h-56 bg-gradient-to-br from-violet-100 via-purple-100 to-pink-100 flex items-center justify-center">
-                                    <div className="text-6xl">{getCategoryIcon(service.category?.name || '')}</div>
+                                {/* Service Image */}
+                                <div className="relative h-56 overflow-hidden">
+                                    {service.image ? (
+                                        <img
+                                            src={service.image}
+                                            alt={service.name}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className="h-full bg-gradient-to-br from-violet-100 via-purple-100 to-pink-100 flex items-center justify-center">
+                                            <div className="text-6xl">{getCategoryIcon(service.category?.name || '')}</div>
+                                        </div>
+                                    )}
 
                                     {/* Category Badge */}
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-violet-600 rounded-full text-xs font-semibold">
