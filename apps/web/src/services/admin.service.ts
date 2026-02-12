@@ -78,7 +78,7 @@ class AdminService {
             timeSlot: string;
         }
     ): Promise<ApiResponse<Appointment>> {
-        return apiService.post<ApiResponse<Appointment>>(`/leads/${id}/convert`, data);
+        return apiService.put<ApiResponse<Appointment>>(`/leads/${id}/convert`, data);
     }
 
     async deleteLead(id: string): Promise<ApiResponse<null>> {

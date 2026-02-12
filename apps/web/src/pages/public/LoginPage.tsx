@@ -43,10 +43,7 @@ export default function LoginPage() {
         }
     };
 
-    const demoCredentials = [
-        { role: 'Admin', email: 'admin@lifescc.com', password: 'Admin@123' },
-        { role: 'Patient', email: 'ananya.reddy@gmail.com', password: 'Admin@123' },
-    ];
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 flex items-center justify-center p-6">
@@ -209,19 +206,7 @@ export default function LoginPage() {
                                 </p>
                             </div>
 
-                            {/* Demo Credentials */}
-                            <div className="mt-8 p-4 bg-violet-50 rounded-xl border border-violet-100">
-                                <p className="text-sm font-semibold text-violet-900 mb-3">Demo Credentials:</p>
-                                <div className="space-y-2">
-                                    {demoCredentials.map((cred, index) => (
-                                        <div key={index} className="text-xs space-y-1">
-                                            <p className="font-medium text-violet-800">{cred.role}:</p>
-                                            <p className="text-violet-700 font-mono">{cred.email}</p>
-                                            <p className="text-violet-700 font-mono">{cred.password}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+
                         </CardContent>
                     </Card>
                 </div>

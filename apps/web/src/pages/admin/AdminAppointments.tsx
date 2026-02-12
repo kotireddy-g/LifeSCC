@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Calendar, Search, Filter } from 'lucide-react';
+import { LogOut, LayoutDashboard, Calendar, Search, Filter, Phone, Mail, MapPin, Clock, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -93,12 +93,19 @@ export default function AdminAppointments() {
     });
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50/30">
+            {/* Decorative Background Elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
+                <div className="absolute top-0 -right-4 w-72 h-72 bg-violet-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+                <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
+            </div>
+
             {/* Header */}
-            <header className="border-b bg-white sticky top-0 z-50">
+            <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
-                        <Link to="/admin/dashboard" className="text-2xl font-bold gradient-text">
+                        <Link to="/admin/dashboard" className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                             LifeSCC Admin
                         </Link>
                         <div className="flex items-center gap-4">
@@ -109,7 +116,7 @@ export default function AdminAppointments() {
                                         Dashboard
                                     </Button>
                                 </Link>
-                                <Button variant="default" size="sm">
+                                <Button variant="default" size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600">
                                     <Calendar className="h-4 w-4 mr-2" />
                                     Appointments
                                 </Button>
@@ -129,16 +136,21 @@ export default function AdminAppointments() {
                 </div>
             </header>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 relative z-10">
                 {/* Header Section */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-8 animate-fade-in">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2">Manage Appointments</h1>
-                        <p className="text-muted-foreground">
+                        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                            Manage Appointments
+                        </h1>
+                        <p className="text-gray-600 text-lg">
                             View and manage all clinic appointments
                         </p>
                     </div>
-                    <Button onClick={() => setShowFilters(!showFilters)}>
+                    <Button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl"
+                    >
                         <Filter className="h-4 w-4 mr-2" />
                         {showFilters ? 'Hide Filters' : 'Show Filters'}
                     </Button>
@@ -146,9 +158,13 @@ export default function AdminAppointments() {
 
                 {/* Filters */}
                 {showFilters && (
-                    <Card className="mb-6">
+                    <Card className="mb-6 overflow-hidden bg-white/90 backdrop-blur shadow-soft border-gray-100">
+                        <div className="h-1.5 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
                         <CardHeader>
-                            <CardTitle className="text-lg">Filters</CardTitle>
+                            <CardTitle className="text-xl flex items-center gap-2">
+                                <Sparkles className="h-5 w-5 text-violet-600" />
+                                Filters
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="grid md:grid-cols-3 gap-4">
@@ -157,7 +173,7 @@ export default function AdminAppointments() {
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
                                     >
                                         <option value="">All Statuses</option>
                                         {Object.values(APPOINTMENT_STATUS).map((status) => (
@@ -173,7 +189,7 @@ export default function AdminAppointments() {
                                     <select
                                         value={branchFilter}
                                         onChange={(e) => setBranchFilter(e.target.value)}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
                                     >
                                         <option value="">All Branches</option>
                                         {branches.map((branch) => (
@@ -192,7 +208,7 @@ export default function AdminAppointments() {
                                             placeholder="Name, phone, service..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="pl-10"
+                                            className="pl-10 focus-visible:ring-violet-600"
                                         />
                                     </div>
                                 </div>
@@ -201,17 +217,22 @@ export default function AdminAppointments() {
                     </Card>
                 )}
 
-                {/* Appointments Table */}
+                {/* Appointments List */}
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                        <div className="relative h-20 w-20">
+                            <div className="absolute inset-0 rounded-full border-4 border-violet-200 opacity-25" />
+                            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-violet-600 animate-spin" />
+                        </div>
                     </div>
                 ) : filteredAppointments.length === 0 ? (
-                    <Card>
+                    <Card className="overflow-hidden bg-white/90 backdrop-blur shadow-soft">
                         <CardContent className="py-12 text-center">
-                            <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                            <h3 className="text-xl font-semibold mb-2">No appointments found</h3>
-                            <p className="text-muted-foreground">
+                            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center">
+                                <Calendar className="h-10 w-10 text-violet-600" />
+                            </div>
+                            <h3 className="text-2xl font-semibold mb-3 text-gray-900">No appointments found</h3>
+                            <p className="text-gray-600 text-lg">
                                 Try adjusting your filters
                             </p>
                         </CardContent>
@@ -219,36 +240,52 @@ export default function AdminAppointments() {
                 ) : (
                     <div className="space-y-4">
                         {filteredAppointments.map((appointment) => (
-                            <Card key={appointment.id}>
+                            <Card key={appointment.id} className="group hover-lift overflow-hidden bg-white/90 backdrop-blur shadow-soft border-gray-100">
+                                <div className="h-1.5 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
                                 <CardContent className="p-6">
                                     <div className="grid md:grid-cols-12 gap-4">
                                         {/* Patient Info */}
                                         <div className="md:col-span-3">
-                                            <div className="font-semibold mb-1">{appointment.patientName}</div>
-                                            <div className="text-sm text-muted-foreground space-y-0.5">
-                                                <div>📞 {appointment.patientPhone}</div>
+                                            <div className="font-semibold text-gray-900 mb-2">{appointment.patientName}</div>
+                                            <div className="text-sm text-gray-600 space-y-1.5">
+                                                <div className="flex items-center gap-2">
+                                                    <Phone className="h-4 w-4 text-violet-600" />
+                                                    {appointment.patientPhone}
+                                                </div>
                                                 {appointment.patientEmail && (
-                                                    <div>✉️ {appointment.patientEmail}</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Mail className="h-4 w-4 text-violet-600" />
+                                                        {appointment.patientEmail}
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
 
                                         {/* Appointment Details */}
                                         <div className="md:col-span-4">
-                                            <div className="font-semibold mb-1">{appointment.service?.name}</div>
-                                            <div className="text-sm text-muted-foreground space-y-0.5">
-                                                <div>📍 {appointment.branch?.name}</div>
-                                                <div>📅 {formatDate(appointment.appointmentDate, 'PPP')}</div>
-                                                <div>🕒 {appointment.timeSlot}</div>
+                                            <div className="font-semibold text-gray-900 mb-2">{appointment.service?.name}</div>
+                                            <div className="text-sm text-gray-600 space-y-1.5">
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="h-4 w-4 text-violet-600" />
+                                                    {appointment.branch?.name}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-violet-600" />
+                                                    {formatDate(appointment.appointmentDate, 'PPP')}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4 text-violet-600" />
+                                                    {appointment.timeSlot}
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Price & Status */}
                                         <div className="md:col-span-2">
-                                            <div className="font-semibold text-primary mb-1">
+                                            <div className="font-bold text-lg mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                                                 {appointment.service?.price ? formatCurrency(appointment.service.price) : 'N/A'}
                                             </div>
-                                            <span className={`text-xs px-2 py-1 rounded ${APPOINTMENT_STATUS_COLORS[appointment.status]}`}>
+                                            <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${APPOINTMENT_STATUS_COLORS[appointment.status]}`}>
                                                 {APPOINTMENT_STATUS_LABELS[appointment.status]}
                                             </span>
                                         </div>
@@ -258,19 +295,41 @@ export default function AdminAppointments() {
                                             {appointment.status === APPOINTMENT_STATUS.PENDING && (
                                                 <Button
                                                     size="sm"
+                                                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl"
                                                     onClick={() => handleStatusUpdate(appointment.id, APPOINTMENT_STATUS.CONFIRMED)}
                                                     disabled={updating === appointment.id}
                                                 >
-                                                    {updating === appointment.id ? 'Updating...' : 'Confirm'}
+                                                    {updating === appointment.id ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                                                            Updating...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                                                            Confirm
+                                                        </>
+                                                    )}
                                                 </Button>
                                             )}
                                             {appointment.status === APPOINTMENT_STATUS.CONFIRMED && (
                                                 <Button
                                                     size="sm"
+                                                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl"
                                                     onClick={() => handleStatusUpdate(appointment.id, APPOINTMENT_STATUS.COMPLETED)}
                                                     disabled={updating === appointment.id}
                                                 >
-                                                    {updating === appointment.id ? 'Updating...' : 'Mark Complete'}
+                                                    {updating === appointment.id ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                                                            Updating...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                                                            Mark Complete
+                                                        </>
+                                                    )}
                                                 </Button>
                                             )}
                                             {(appointment.status === APPOINTMENT_STATUS.PENDING ||
@@ -278,6 +337,7 @@ export default function AdminAppointments() {
                                                     <Button
                                                         size="sm"
                                                         variant="destructive"
+                                                        className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 shadow-lg hover:shadow-xl"
                                                         onClick={() => handleStatusUpdate(appointment.id, APPOINTMENT_STATUS.CANCELLED)}
                                                         disabled={updating === appointment.id}
                                                     >
@@ -288,9 +348,9 @@ export default function AdminAppointments() {
                                     </div>
 
                                     {appointment.notes && (
-                                        <div className="mt-4 pt-4 border-t">
-                                            <span className="text-sm text-muted-foreground">Notes: </span>
-                                            <span className="text-sm">{appointment.notes}</span>
+                                        <div className="mt-4 pt-4 border-t border-gray-100">
+                                            <span className="text-sm font-medium text-gray-700">Notes: </span>
+                                            <span className="text-sm text-gray-600">{appointment.notes}</span>
                                         </div>
                                     )}
                                 </CardContent>
@@ -302,34 +362,40 @@ export default function AdminAppointments() {
                 {/* Summary Stats */}
                 {!loading && filteredAppointments.length > 0 && (
                     <div className="grid md:grid-cols-4 gap-4 mt-8">
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold">{filteredAppointments.length}</div>
-                                <div className="text-sm text-muted-foreground">Total Shown</div>
+                        <Card className="overflow-hidden bg-white/90 backdrop-blur shadow-soft hover-lift">
+                            <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-500" />
+                            <CardContent className="p-6 text-center">
+                                <div className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                                    {filteredAppointments.length}
+                                </div>
+                                <div className="text-sm text-gray-600 font-medium">Total Shown</div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold text-yellow-600">
+                        <Card className="overflow-hidden bg-white/90 backdrop-blur shadow-soft hover-lift">
+                            <div className="h-1 bg-gradient-to-r from-yellow-500 to-orange-500" />
+                            <CardContent className="p-6 text-center">
+                                <div className="text-3xl font-bold text-yellow-600 mb-2">
                                     {filteredAppointments.filter(a => a.status === APPOINTMENT_STATUS.PENDING).length}
                                 </div>
-                                <div className="text-sm text-muted-foreground">Pending</div>
+                                <div className="text-sm text-gray-600 font-medium">Pending</div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold text-blue-600">
+                        <Card className="overflow-hidden bg-white/90 backdrop-blur shadow-soft hover-lift">
+                            <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                            <CardContent className="p-6 text-center">
+                                <div className="text-3xl font-bold text-blue-600 mb-2">
                                     {filteredAppointments.filter(a => a.status === APPOINTMENT_STATUS.CONFIRMED).length}
                                 </div>
-                                <div className="text-sm text-muted-foreground">Confirmed</div>
+                                <div className="text-sm text-gray-600 font-medium">Confirmed</div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold text-green-600">
+                        <Card className="overflow-hidden bg-white/90 backdrop-blur shadow-soft hover-lift">
+                            <div className="h-1 bg-gradient-to-r from-green-500 to-emerald-500" />
+                            <CardContent className="p-6 text-center">
+                                <div className="text-3xl font-bold text-green-600 mb-2">
                                     {filteredAppointments.filter(a => a.status === APPOINTMENT_STATUS.COMPLETED).length}
                                 </div>
-                                <div className="text-sm text-muted-foreground">Completed</div>
+                                <div className="text-sm text-gray-600 font-medium">Completed</div>
                             </CardContent>
                         </Card>
                     </div>
