@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Calendar, Clock, User, LogOut, Sparkles, TrendingUp,
+    Calendar, Clock, User, LogOut, Sparkles,
     Heart, Award, ChevronRight, Activity
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -116,9 +116,21 @@ export default function PatientDashboard() {
     ];
 
     const serviceCategories = [
-        { name: 'Weight Loss', icon: '⚖️', color: 'violet' },
-        { name: 'Skin Care', icon: '✨', color: 'pink' },
-        { name: 'Hair Care', icon: '💇', color: 'teal' }
+        {
+            name: 'Weight Loss',
+            image: 'https://www.lifescc.com/img/t6.png',
+            description: 'Explore weight loss treatments'
+        },
+        {
+            name: 'Skin Care',
+            image: 'https://www.lifescc.com/img/scul3.jpg',
+            description: 'Explore skin care treatments'
+        },
+        {
+            name: 'Hair Care',
+            image: 'https://www.lifescc.com/img/home.jpg',
+            description: 'Explore hair care treatments'
+        }
     ];
 
     return (
@@ -318,7 +330,10 @@ export default function PatientDashboard() {
                             </p>
                         </div>
                         <Link to="/services">
-                            <Button className="btn-secondary">
+                            <Button
+                                size="lg"
+                                className="bg-white text-violet-600 hover:bg-gray-50 border-2 border-violet-200 hover:border-violet-300 px-8 py-3 rounded-xl font-semibold shadow-soft hover-lift transition-all duration-300"
+                            >
                                 View All Services
                                 <ChevronRight className="w-5 h-5 ml-2" />
                             </Button>
@@ -331,20 +346,26 @@ export default function PatientDashboard() {
                                 to="/services"
                                 className={`group animate-scale-in delay-${(index + 2) * 100}`}
                             >
-                                <Card className="hover-lift border-0 shadow-soft bg-gradient-to-br from-white to-gray-50 overflow-hidden">
-                                    <CardContent className="p-8">
-                                        <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                                            {category.icon}
+                                <Card className="hover-lift border-0 shadow-soft bg-white overflow-hidden">
+                                    <CardContent className="p-0">
+                                        <div className="relative w-full h-48 overflow-hidden">
+                                            <img
+                                                src={category.image}
+                                                alt={category.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            />
                                         </div>
-                                        <h3 className="font-['Poppins'] text-2xl font-semibold mb-2 text-gray-900">
-                                            {category.name}
-                                        </h3>
-                                        <p className="text-gray-600 mb-4">
-                                            Explore {category.name.toLowerCase()} treatments
-                                        </p>
-                                        <div className="flex items-center text-violet-600 font-semibold group-hover:gap-2 transition-all">
-                                            <span>Learn More</span>
-                                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                        <div className="p-6">
+                                            <h3 className="font-['Poppins'] text-2xl font-semibold mb-2 text-gray-900">
+                                                {category.name}
+                                            </h3>
+                                            <p className="text-gray-600 mb-4">
+                                                {category.description}
+                                            </p>
+                                            <div className="flex items-center text-violet-600 font-semibold group-hover:gap-2 transition-all">
+                                                <span>Learn More</span>
+                                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>

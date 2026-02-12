@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, LogIn, Mail, Lock, ArrowRight, Shield, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
 
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -19,7 +18,6 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-    const navigate = useNavigate();
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -35,13 +33,11 @@ export default function LoginPage() {
     const onSubmit = async (data: LoginForm) => {
         setIsLoading(true);
         try {
-            const response = await login(data.email, data.password);
-            if (response.success) {
-                toast.success('Welcome back!');
-                // Navigation is handled by AuthContext
-            }
+            await login(data.email, data.password);
+            // Success toast and navigation are handled by AuthContext
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            // Error toast is already shown by AuthContext, no need to duplicate
+            console.error('Login error:', error);
         } finally {
             setIsLoading(false);
         }

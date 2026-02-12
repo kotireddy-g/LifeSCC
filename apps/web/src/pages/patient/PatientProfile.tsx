@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, User, Mail, Phone, Calendar } from 'lucide-react';
+import { LogOut, User, Mail, Phone, Calendar, MapPin, Edit2, Save, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDate } from '@/lib/utils';
@@ -84,19 +84,23 @@ export default function PatientProfile() {
     };
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50/30 relative overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-200/20 to-purple-200/20 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-pink-200/20 to-rose-200/20 rounded-full blur-3xl" />
+
             {/* Header */}
-            <header className="border-b bg-white">
+            <header className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
-                        <Link to="/patient/dashboard" className="text-2xl font-bold gradient-text">
-                            LifeSCC
+                        <Link to="/patient/dashboard" className="flex items-center gap-2">
+                            <span className="text-2xl font-bold gradient-text">LifeSCC</span>
                         </Link>
                         <div className="flex items-center gap-4">
                             <Link to="/patient/dashboard">
-                                <Button variant="ghost" size="sm">Dashboard</Button>
+                                <Button variant="ghost" size="sm" className="hover:bg-violet-50">Dashboard</Button>
                             </Link>
-                            <Button variant="ghost" size="sm" onClick={logout}>
+                            <Button variant="ghost" size="sm" onClick={logout} className="hover:bg-violet-50">
                                 <LogOut className="h-4 w-4 mr-2" />
                                 Logout
                             </Button>
@@ -105,34 +109,47 @@ export default function PatientProfile() {
                 </div>
             </header>
 
-            <div className="container mx-auto px-4 py-8 max-w-3xl">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-                    <p className="text-muted-foreground">
+            <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+                {/* Page Header */}
+                <div className="mb-8 animate-fade-in">
+                    <h1 className="font-['Poppins'] text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                        My Profile
+                    </h1>
+                    <p className="text-gray-600 text-lg">
                         Manage your personal information
                     </p>
                 </div>
 
-                {/* Profile Header */}
-                <Card className="mb-6">
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold">
-                                {user?.firstName.charAt(0)}{user?.lastName.charAt(0)}
+                {/* Profile Header Card */}
+                <Card className="mb-8 border-0 shadow-soft bg-white/90 backdrop-blur overflow-hidden hover-lift transition-all duration-300">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
+                    <CardContent className="p-8">
+                        <div className="flex items-center gap-6">
+                            <div className="relative">
+                                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-violet-200">
+                                    {user?.firstName.charAt(0)}{user?.lastName.charAt(0)}
+                                </div>
+                                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 border-4 border-white flex items-center justify-center">
+                                    <User className="h-4 w-4 text-white" />
+                                </div>
                             </div>
-                            <div>
-                                <h2 className="text-2xl font-bold">
+                            <div className="flex-1">
+                                <h2 className="font-['Poppins'] text-3xl font-bold text-gray-900 mb-1">
                                     {user?.firstName} {user?.lastName}
                                 </h2>
-                                <p className="text-muted-foreground">{user?.email}</p>
-                                <div className="flex items-center gap-4 mt-2 text-sm">
-                                    <span className={`px-2 py-1 rounded text-xs ${user?.isVerified
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-yellow-100 text-yellow-800'
+                                <p className="text-gray-600 mb-3 flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    {user?.email}
+                                </p>
+                                <div className="flex items-center gap-4 flex-wrap">
+                                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${user?.isVerified
+                                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
                                         }`}>
-                                        {user?.isVerified ? 'Verified' : 'Not Verified'}
+                                        {user?.isVerified ? '✓ Verified' : '⚠ Not Verified'}
                                     </span>
-                                    <span className="text-muted-foreground">
+                                    <span className="text-sm text-gray-600 flex items-center gap-2">
+                                        <Calendar className="h-4 w-4" />
                                         Member since {user?.createdAt ? formatDate(user.createdAt, 'MMM yyyy') : 'N/A'}
                                     </span>
                                 </div>
@@ -141,90 +158,126 @@ export default function PatientProfile() {
                     </CardContent>
                 </Card>
 
-                {/* Profile Form */}
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
+                {/* Profile Form Card */}
+                <Card className="border-0 shadow-soft bg-white/90 backdrop-blur overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500" />
+                    <CardContent className="p-8">
+                        <div className="flex items-center justify-between mb-6">
                             <div>
-                                <CardTitle>Personal Information</CardTitle>
-                                <CardDescription>Update your personal details</CardDescription>
+                                <h3 className="font-['Poppins'] text-2xl font-bold text-gray-900 mb-1">Personal Information</h3>
+                                <p className="text-gray-600">Update your personal details</p>
                             </div>
                             {!isEditing && (
-                                <Button onClick={() => setIsEditing(true)}>
+                                <Button
+                                    onClick={() => setIsEditing(true)}
+                                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-200 hover-lift"
+                                >
+                                    <Edit2 className="h-4 w-4 mr-2" />
                                     Edit Profile
                                 </Button>
                             )}
                         </div>
-                    </CardHeader>
-                    <CardContent>
+
                         <form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="space-y-4">
-                                <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-6">
+                                {/* Name Fields */}
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="firstName">First Name *</Label>
+                                        <Label htmlFor="firstName" className="text-gray-700 font-semibold flex items-center gap-2">
+                                            <User className="h-4 w-4 text-violet-600" />
+                                            First Name *
+                                        </Label>
                                         <Input
                                             id="firstName"
                                             {...register('firstName')}
                                             disabled={!isEditing}
+                                            className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
                                         />
                                         {errors.firstName && (
-                                            <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                                            <p className="text-sm text-red-600 flex items-center gap-1">
+                                                <span className="font-medium">⚠</span> {errors.firstName.message}
+                                            </p>
                                         )}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="lastName">Last Name *</Label>
+                                        <Label htmlFor="lastName" className="text-gray-700 font-semibold flex items-center gap-2">
+                                            <User className="h-4 w-4 text-violet-600" />
+                                            Last Name *
+                                        </Label>
                                         <Input
                                             id="lastName"
                                             {...register('lastName')}
                                             disabled={!isEditing}
+                                            className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
                                         />
                                         {errors.lastName && (
-                                            <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                                            <p className="text-sm text-red-600 flex items-center gap-1">
+                                                <span className="font-medium">⚠</span> {errors.lastName.message}
+                                            </p>
                                         )}
                                     </div>
                                 </div>
 
+                                {/* Email Field */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="email" className="text-gray-700 font-semibold flex items-center gap-2">
+                                        <Mail className="h-4 w-4 text-violet-600" />
+                                        Email
+                                    </Label>
                                     <Input
                                         id="email"
                                         value={user?.email}
                                         disabled
-                                        className="bg-muted"
+                                        className="bg-gray-50"
                                     />
-                                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                        <span>🔒</span> Email cannot be changed
+                                    </p>
                                 </div>
 
+                                {/* Phone Field */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="phone">Phone Number</Label>
+                                    <Label htmlFor="phone" className="text-gray-700 font-semibold flex items-center gap-2">
+                                        <Phone className="h-4 w-4 text-violet-600" />
+                                        Phone Number
+                                    </Label>
                                     <Input
                                         id="phone"
                                         type="tel"
                                         {...register('phone')}
                                         disabled={!isEditing}
                                         placeholder="+91 98765 43210"
+                                        className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
                                     />
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-4">
+                                {/* Date of Birth & Gender */}
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                                        <Label htmlFor="dateOfBirth" className="text-gray-700 font-semibold flex items-center gap-2">
+                                            <Calendar className="h-4 w-4 text-violet-600" />
+                                            Date of Birth
+                                        </Label>
                                         <Input
                                             id="dateOfBirth"
                                             type="date"
                                             {...register('dateOfBirth')}
                                             disabled={!isEditing}
+                                            className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="gender">Gender</Label>
+                                        <Label htmlFor="gender" className="text-gray-700 font-semibold flex items-center gap-2">
+                                            <User className="h-4 w-4 text-violet-600" />
+                                            Gender
+                                        </Label>
                                         <select
                                             id="gender"
                                             {...register('gender')}
                                             disabled={!isEditing}
-                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                            className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${!isEditing ? 'bg-gray-50 border-gray-200' : 'bg-white border-violet-200 focus-visible:ring-violet-400'} transition-all duration-200`}
                                         >
                                             <option value="">Select</option>
                                             <option value="Male">Male</option>
@@ -234,51 +287,85 @@ export default function PatientProfile() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="address">Address</Label>
-                                    <Input
-                                        id="address"
-                                        {...register('address')}
-                                        disabled={!isEditing}
-                                        placeholder="Street address"
-                                    />
+                                {/* Address Section */}
+                                <div className="pt-4 border-t border-gray-100">
+                                    <h4 className="font-['Poppins'] text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <MapPin className="h-5 w-5 text-violet-600" />
+                                        Address Information
+                                    </h4>
+
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="address" className="text-gray-700 font-semibold">
+                                                Street Address
+                                            </Label>
+                                            <Input
+                                                id="address"
+                                                {...register('address')}
+                                                disabled={!isEditing}
+                                                placeholder="Street address"
+                                                className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
+                                            />
+                                        </div>
+
+                                        <div className="grid md:grid-cols-3 gap-6">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="city" className="text-gray-700 font-semibold">
+                                                    City
+                                                </Label>
+                                                <Input
+                                                    id="city"
+                                                    {...register('city')}
+                                                    disabled={!isEditing}
+                                                    className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="state" className="text-gray-700 font-semibold">
+                                                    State
+                                                </Label>
+                                                <Input
+                                                    id="state"
+                                                    {...register('state')}
+                                                    disabled={!isEditing}
+                                                    className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="pincode" className="text-gray-700 font-semibold">
+                                                    Pincode
+                                                </Label>
+                                                <Input
+                                                    id="pincode"
+                                                    {...register('pincode')}
+                                                    disabled={!isEditing}
+                                                    className={`${!isEditing ? 'bg-gray-50' : 'bg-white border-violet-200 focus:border-violet-400 focus:ring-violet-400'} transition-all duration-200`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="grid md:grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="city">City</Label>
-                                        <Input
-                                            id="city"
-                                            {...register('city')}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="state">State</Label>
-                                        <Input
-                                            id="state"
-                                            {...register('state')}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="pincode">Pincode</Label>
-                                        <Input
-                                            id="pincode"
-                                            {...register('pincode')}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-
+                                {/* Action Buttons */}
                                 {isEditing && (
-                                    <div className="flex gap-4 pt-4">
-                                        <Button type="submit" disabled={isSaving}>
+                                    <div className="flex gap-4 pt-6 border-t border-gray-100">
+                                        <Button
+                                            type="submit"
+                                            disabled={isSaving}
+                                            className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg shadow-violet-200 hover-lift"
+                                        >
+                                            <Save className="h-4 w-4 mr-2" />
                                             {isSaving ? 'Saving...' : 'Save Changes'}
                                         </Button>
-                                        <Button type="button" variant="outline" onClick={handleCancel}>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleCancel}
+                                            className="border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                        >
+                                            <X className="h-4 w-4 mr-2" />
                                             Cancel
                                         </Button>
                                     </div>
