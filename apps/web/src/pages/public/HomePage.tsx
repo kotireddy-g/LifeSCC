@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -7,6 +8,26 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+    // Auto-scrolling carousel images
+    const carouselImages = [
+        'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800',
+        'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800',
+        'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=800'
+    ];
+
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    // Auto-scroll carousel every 3 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [carouselImages.length]);
+
     const stats = [
         { icon: Clock, label: 'Years Experience', value: '15+', color: 'violet' },
         { icon: MapPin, label: 'Clinic Locations', value: '10+', color: 'purple' },
@@ -163,15 +184,45 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        {/* Hero Image/Visual */}
+                        {/* Hero Image/Visual - Auto-scrolling Carousel */}
                         <div className="relative lg:block hidden animate-slide-in-right">
                             <div className="relative">
                                 <div className="absolute inset-0 gradient-primary rounded-3xl blur-3xl opacity-20"></div>
                                 <div className="relative bg-white rounded-3xl p-8 shadow-premium">
-                                    <div className="aspect-square rounded-2xl bg-gradient-to-br from-violet-100 via-purple-100 to-pink-100 flex items-center justify-center">
-                                        <div className="text-center">
-                                            <Sparkles className="w-32 h-32 text-violet-600 mx-auto mb-4" />
-                                            <p className="text-lg font-semibold text-gray-800">Premium Aesthetic Care</p>
+                                    <div className="aspect-square rounded-2xl overflow-hidden relative">
+                                        {/* Carousel Images */}
+                                        {carouselImages.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                                                    }`}
+                                            >
+                                                <img
+                                                    src={image}
+                                                    alt={`Luxury clinic interior ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
+
+                                        {/* Overlay Text */}
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                            <p className="text-lg font-semibold text-white">Premium Aesthetic Care</p>
+                                        </div>
+
+                                        {/* Carousel Indicators */}
+                                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                            {carouselImages.map((_, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => setCurrentImageIndex(index)}
+                                                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
+                                                            ? 'bg-white w-6'
+                                                            : 'bg-white/50 hover:bg-white/75'
+                                                        }`}
+                                                    aria-label={`Go to image ${index + 1}`}
+                                                />
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
