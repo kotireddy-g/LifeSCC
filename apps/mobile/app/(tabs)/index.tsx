@@ -1,14 +1,64 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../lib/AuthContext';
+import { apiService } from '../../lib/api';
+
+interface Appointment {
+    id: string;
+    service: { name: string };
+    branch: { name: string };
+    appointmentDate: string;
+    timeSlot: string;
+    status: string;
+}
 
 export default function HomeTab() {
     const router = useRouter();
+    const { user } = useAuth();
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({
+        total: 0,
+        upcoming: 0,
+        completed: 0,
+        services: '15+'
+    });
 
-    const stats = [
-        { label: 'Total Appointments', value: '24', icon: '📅' },
-        { label: 'Upcoming', value: '3', icon: '🔔' },
-        { label: 'Completed', value: '18', icon: '✅' },
-        { label: 'Services', value: '15+', icon: '💆' }
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response = await apiService.getMyAppointments();
+            const appointmentsData = response.data?.data || response.data || [];
+            const appointmentsList = Array.isArray(appointmentsData) ? appointmentsData : [];
+
+            setAppointments(appointmentsList);
+
+            // Calculate stats
+            const now = new Date();
+            setStats({
+                total: appointmentsList.length,
+                upcoming: appointmentsList.filter((a: Appointment) =>
+                    new Date(a.appointmentDate) >= now && a.status !== 'CANCELLED'
+                ).length,
+                completed: appointmentsList.filter((a: Appointment) => a.status === 'COMPLETED').length,
+                services: '15+'
+            });
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const statsDisplay = [
+        { label: 'Total Appointments', value: stats.total.toString(), icon: '📅' },
+        { label: 'Upcoming', value: stats.upcoming.toString(), icon: '🔔' },
+        { label: 'Completed', value: stats.completed.toString(), icon: '✅' },
+        { label: 'Services', value: stats.services, icon: '💆' }
     ];
 
     const quickActions = [
@@ -18,24 +68,21 @@ export default function HomeTab() {
         { title: 'My Profile', icon: '👤', color: '#10B981', route: '/(tabs)/profile' }
     ];
 
-    const upcomingAppointments = [
-        {
-            id: '1',
-            service: 'Weight Loss Program',
-            branch: 'Jubilee Hills',
-            date: 'Feb 15, 2026',
-            time: '10:00 AM',
-            status: 'Confirmed'
-        },
-        {
-            id: '2',
-            service: 'Skin Rejuvenation',
-            branch: 'Banjara Hills',
-            date: 'Feb 18, 2026',
-            time: '2:30 PM',
-            status: 'Pending'
-        }
-    ];
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const upcomingAppointments = appointments
+        .filter(apt => new Date(apt.appointmentDate) >= new Date() && apt.status !== 'CANCELLED')
+        .slice(0, 3);
+
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#8B5CF6" />
+            </View>
+        );
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -43,13 +90,13 @@ export default function HomeTab() {
             <View style={styles.header}>
                 <View>
                     <Text style={styles.greeting}>Welcome back! 👋</Text>
-                    <Text style={styles.name}>Ananya Reddy</Text>
+                    <Text style={styles.name}>{user?.firstName} {user?.lastName}</Text>
                 </View>
             </View>
 
             {/* Stats Grid */}
             <View style={styles.statsGrid}>
-                {stats.map((stat, index) => (
+                {statsDisplay.map((stat, index) => (
                     <View key={index} style={styles.statCard}>
                         <Text style={styles.statIcon}>{stat.icon}</Text>
                         <Text style={styles.statValue}>{stat.value}</Text>
@@ -80,41 +127,40 @@ export default function HomeTab() {
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
                     <TouchableOpacity onPress={() => router.push('/(tabs)/appointments')}>
-                        <Text style={styles.seeAll}>See All</Text>
+                        <Text style={styles.seeAll}>See All →</Text>
                     </TouchableOpacity>
                 </View>
 
-                {upcomingAppointments.map((apt) => (
-                    <View key={apt.id} style={styles.appointmentCard}>
-                        <View style={styles.appointmentHeader}>
-                            <Text style={styles.appointmentService}>{apt.service}</Text>
-                            <View style={[styles.statusBadge, apt.status === 'Confirmed' ? styles.statusConfirmed : styles.statusPending]}>
-                                <Text style={styles.statusText}>{apt.status}</Text>
-                            </View>
-                        </View>
-                        <Text style={styles.appointmentDetail}>📍 {apt.branch}</Text>
-                        <Text style={styles.appointmentDetail}>📅 {apt.date} at {apt.time}</Text>
-                    </View>
-                ))}
-            </View>
-
-            {/* Service Categories */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Explore Services</Text>
-                <View style={styles.categoriesGrid}>
-                    {['Weight Loss', 'Skin Care', 'Hair Care'].map((category, index) => (
+                {upcomingAppointments.length === 0 ? (
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyIcon}>📅</Text>
+                        <Text style={styles.emptyText}>No upcoming appointments</Text>
                         <TouchableOpacity
-                            key={index}
-                            style={styles.categoryCard}
-                            onPress={() => router.push('/(tabs)/services')}
+                            style={styles.bookButton}
+                            onPress={() => router.push('/book')}
                         >
-                            <Text style={styles.categoryIcon}>
-                                {index === 0 ? '⚖️' : index === 1 ? '✨' : '💇'}
-                            </Text>
-                            <Text style={styles.categoryName}>{category}</Text>
+                            <Text style={styles.bookButtonText}>Book Now</Text>
                         </TouchableOpacity>
-                    ))}
-                </View>
+                    </View>
+                ) : (
+                    upcomingAppointments.map((appointment) => (
+                        <View key={appointment.id} style={styles.appointmentCard}>
+                            <View style={styles.appointmentHeader}>
+                                <Text style={styles.serviceName}>{appointment.service.name}</Text>
+                                <View style={[
+                                    styles.statusBadge,
+                                    appointment.status === 'CONFIRMED' ? styles.statusConfirmed : styles.statusPending
+                                ]}>
+                                    <Text style={styles.statusText}>{appointment.status}</Text>
+                                </View>
+                            </View>
+                            <Text style={styles.branchName}>📍 {appointment.branch.name}</Text>
+                            <Text style={styles.dateTime}>
+                                📅 {formatDate(appointment.appointmentDate)} at {appointment.timeSlot}
+                            </Text>
+                        </View>
+                    ))
+                )}
             </View>
         </ScrollView>
     );
@@ -123,24 +169,23 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb'
+        backgroundColor: '#F9FAFB'
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        backgroundColor: '#8B5CF6',
         padding: 20,
-        backgroundColor: 'white'
+        paddingTop: 60,
+        paddingBottom: 30
     },
     greeting: {
         fontSize: 16,
-        color: '#6b7280'
+        color: '#E9D5FF',
+        marginBottom: 4
     },
     name: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
-        color: '#1f2937',
-        marginTop: 4
+        color: 'white'
     },
     statsGrid: {
         flexDirection: 'row',
@@ -150,35 +195,40 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        minWidth: '47%',
+        minWidth: '45%',
         backgroundColor: 'white',
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2
     },
     statIcon: {
-        fontSize: 24,
+        fontSize: 32,
         marginBottom: 8
     },
     statValue: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#8B5CF6',
+        color: '#1F2937',
         marginBottom: 4
     },
     statLabel: {
         fontSize: 12,
-        color: '#6b7280',
+        color: '#6B7280',
         textAlign: 'center'
     },
     section: {
-        padding: 20,
-        paddingTop: 12
+        padding: 16
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1F2937',
+        marginBottom: 16
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -186,15 +236,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16
     },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1f2937',
-        marginBottom: 16
-    },
     seeAll: {
-        color: '#8B5CF6',
         fontSize: 14,
+        color: '#8B5CF6',
         fontWeight: '600'
     },
     actionsGrid: {
@@ -204,19 +248,24 @@ const styles = StyleSheet.create({
     },
     actionCard: {
         flex: 1,
-        minWidth: '47%',
+        minWidth: '45%',
         padding: 20,
         borderRadius: 12,
-        alignItems: 'center'
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3
     },
     actionIcon: {
         fontSize: 32,
         marginBottom: 8
     },
     actionTitle: {
-        color: 'white',
         fontSize: 14,
         fontWeight: '600',
+        color: 'white',
         textAlign: 'center'
     },
     appointmentCard: {
@@ -226,67 +275,71 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2
     },
     appointmentHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         marginBottom: 8
     },
-    appointmentService: {
+    serviceName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1f2937',
+        color: '#1F2937',
         flex: 1
     },
     statusBadge: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         paddingVertical: 4,
-        borderRadius: 4
+        borderRadius: 12
     },
     statusConfirmed: {
-        backgroundColor: '#dbeafe'
+        backgroundColor: '#D1FAE5'
     },
     statusPending: {
-        backgroundColor: '#fef3c7'
+        backgroundColor: '#FEF3C7'
     },
     statusText: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '600',
-        color: '#1f2937'
+        color: '#065F46'
     },
-    appointmentDetail: {
+    branchName: {
         fontSize: 14,
-        color: '#6b7280',
-        marginTop: 4
+        color: '#6B7280',
+        marginBottom: 4
     },
-    categoriesGrid: {
-        flexDirection: 'row',
-        gap: 12
+    dateTime: {
+        fontSize: 14,
+        color: '#6B7280'
     },
-    categoryCard: {
-        flex: 1,
+    emptyState: {
         backgroundColor: 'white',
-        padding: 20,
+        padding: 32,
         borderRadius: 12,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2
+        alignItems: 'center'
     },
-    categoryIcon: {
-        fontSize: 32,
-        marginBottom: 8
+    emptyIcon: {
+        fontSize: 48,
+        marginBottom: 12
     },
-    categoryName: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#1f2937',
-        textAlign: 'center'
+    emptyText: {
+        fontSize: 16,
+        color: '#6B7280',
+        marginBottom: 16
+    },
+    bookButton: {
+        backgroundColor: '#8B5CF6',
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 8
+    },
+    bookButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600'
     }
 });

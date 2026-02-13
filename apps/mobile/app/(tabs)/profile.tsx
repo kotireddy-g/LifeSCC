@@ -1,17 +1,68 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../../lib/AuthContext';
+import { apiService } from '../../lib/api';
 
 export default function ProfileTab() {
-    const user = {
-        name: 'Ananya Reddy',
-        email: 'ananya.reddy@gmail.com',
-        phone: '+91 98765 43210',
-        memberSince: 'Jan 2026'
+    const router = useRouter();
+    const { user, logout } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [stats, setStats] = useState({
+        total: 0,
+        completed: 0,
+        upcoming: 0
+    });
+
+    useEffect(() => {
+        fetchAppointmentStats();
+    }, []);
+
+    const fetchAppointmentStats = async () => {
+        try {
+            const response = await apiService.getMyAppointments();
+            const appointments = response.data || [];
+            setStats({
+                total: appointments.length,
+                completed: appointments.filter((a: any) => a.status === 'COMPLETED').length,
+                upcoming: appointments.filter((a: any) => a.status === 'CONFIRMED' || a.status === 'PENDING').length
+            });
+        } catch (error) {
+            console.error('Failed to fetch stats:', error);
+        }
     };
 
-    const stats = [
-        { label: 'Total Appointments', value: '24' },
-        { label: 'Completed', value: '18' },
-        { label: 'Upcoming', value: '3' }
+    const handleLogout = () => {
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setLoading(true);
+                        await logout();
+                        router.replace('/login');
+                    }
+                }
+            ]
+        );
+    };
+
+    if (!user) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#8B5CF6" />
+            </View>
+        );
+    }
+
+    const displayStats = [
+        { label: 'Total Appointments', value: stats.total.toString() },
+        { label: 'Completed', value: stats.completed.toString() },
+        { label: 'Upcoming', value: stats.upcoming.toString() }
     ];
 
     const menuItems = [
@@ -30,19 +81,21 @@ export default function ProfileTab() {
             {/* Profile Header */}
             <View style={styles.header}>
                 <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>AR</Text>
+                    <Text style={styles.avatarText}>
+                        {user.firstName?.[0]}{user.lastName?.[0]}
+                    </Text>
                 </View>
-                <Text style={styles.name}>{user.name}</Text>
+                <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
                 <Text style={styles.email}>{user.email}</Text>
-                <Text style={styles.phone}>{user.phone}</Text>
+                <Text style={styles.phone}>{user.phone || 'No phone number'}</Text>
                 <View style={styles.memberBadge}>
-                    <Text style={styles.memberText}>Member since {user.memberSince}</Text>
+                    <Text style={styles.memberText}>Member since {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</Text>
                 </View>
             </View>
 
             {/* Stats */}
             <View style={styles.statsSection}>
-                {stats.map((stat, index) => (
+                {displayStats.map((stat, index) => (
                     <View key={index} style={styles.statCard}>
                         <Text style={styles.statValue}>{stat.value}</Text>
                         <Text style={styles.statLabel}>{stat.label}</Text>
@@ -62,8 +115,8 @@ export default function ProfileTab() {
             </View>
 
             {/* Logout Button */}
-            <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.logoutText}>Logout</Text>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
+                <Text style={styles.logoutText}>{loading ? 'Logging out...' : 'Logout'}</Text>
             </TouchableOpacity>
 
             {/* Version */}

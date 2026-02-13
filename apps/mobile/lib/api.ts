@@ -1,9 +1,22 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
-const API_BASE_URL = __DEV__
-    ? 'http://192.168.1.2:3000/api/v1'  // Use your computer's local IP when testing on device
-    : 'https://your-production-api.com/api/v1';
+// Use localhost for web and simulators, IP address only for physical devices
+const getApiBaseUrl = () => {
+    if (__DEV__) {
+        // For web testing, always use localhost
+        if (Platform.OS === 'web') {
+            return 'http://localhost:5000/api';
+        }
+        // For iOS simulator and Android emulator, use localhost
+        // For physical devices, use your computer's IP address
+        return 'http://localhost:5000/api';
+    }
+    return 'https://your-production-api.com/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
     private token: string | null = null;
@@ -85,7 +98,7 @@ class ApiService {
 
     // Appointments
     async getMyAppointments() {
-        return await this.request('GET', '/appointments/me');
+        return await this.request('GET', '/appointments/my');
     }
 
     async createAppointment(appointmentData: any) {

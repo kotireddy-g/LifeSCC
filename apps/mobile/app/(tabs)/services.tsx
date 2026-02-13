@@ -1,61 +1,63 @@
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { apiService } from '../../lib/api';
+
+interface Service {
+    id: string;
+    name: string;
+    category: {
+        id: string;
+        name: string;
+        slug: string;
+    };
+    duration: number;
+    price: number;
+    discountPrice?: number;
+    isPopular?: boolean;
+    description?: string;
+    shortDesc?: string;
+}
 
 export default function ServicesTab() {
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [services, setServices] = useState<Service[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const categories = ['All', 'Weight Loss', 'Skin Care', 'Hair Care'];
 
-    const services = [
-        {
-            id: '1',
-            name: 'Weight Loss Program',
-            category: 'Weight Loss',
-            duration: 60,
-            price: 15000,
-            discount: 12000,
-            popular: true,
-            icon: '⚖️'
-        },
-        {
-            id: '2',
-            name: 'Skin Rejuvenation',
-            category: 'Skin Care',
-            duration: 45,
-            price: 8000,
-            popular: true,
-            icon: '✨'
-        },
-        {
-            id: '3',
-            name: 'Hair Restoration',
-            category: 'Hair Care',
-            duration: 90,
-            price: 20000,
-            discount: 18000,
-            icon: '💇'
-        },
-        {
-            id: '4',
-            name: 'Laser Hair Removal',
-            category: 'Skin Care',
-            duration: 30,
-            price: 5000,
-            icon: '✨'
-        },
-        {
-            id: '5',
-            name: 'Body Contouring',
-            category: 'Weight Loss',
-            duration: 60,
-            price: 12000,
-            icon: '⚖️'
+    useEffect(() => {
+        fetchServices();
+    }, []);
+
+    const fetchServices = async () => {
+        try {
+            setError(null);
+            const response = await apiService.getServices();
+            // API returns { success: true, data: { services: [...], pagination: {...} } }
+            // Extract the services array from the nested structure
+            const servicesData = response.data?.data?.services || response.data?.services || [];
+            setServices(Array.isArray(servicesData) ? servicesData : []);
+        } catch (err: any) {
+            setError(err.message || 'Failed to load services');
+            setServices([]); // Set empty array on error
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
-    ];
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchServices();
+    };
 
     const filteredServices = services.filter(service => {
-        const matchesCategory = selectedCategory === 'All' || service.category === selectedCategory;
+        const matchesCategory = selectedCategory === 'All' || service.category?.name === selectedCategory;
         const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
@@ -63,6 +65,31 @@ export default function ServicesTab() {
     const formatPrice = (price: number) => {
         return `₹${price.toLocaleString('en-IN')}`;
     };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#8B5CF6" />
+                <Text style={{ marginTop: 16, color: '#6b7280' }}>Loading services...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+                <Text style={{ fontSize: 48, marginBottom: 16 }}>❌</Text>
+                <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 8 }}>Failed to Load Services</Text>
+                <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>{error}</Text>
+                <TouchableOpacity
+                    style={{ backgroundColor: '#8B5CF6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
+                    onPress={fetchServices}
+                >
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -98,34 +125,40 @@ export default function ServicesTab() {
             </ScrollView>
 
             {/* Services List */}
-            <ScrollView style={styles.servicesList} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                style={styles.servicesList}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#8B5CF6']} />
+                }
+            >
                 {filteredServices.map((service) => (
                     <TouchableOpacity key={service.id} style={styles.serviceCard}>
                         <View style={styles.serviceHeader}>
-                            <Text style={styles.serviceIcon}>{service.icon}</Text>
+                            <Text style={styles.serviceIcon}>✨</Text>
                             <View style={styles.serviceInfo}>
                                 <View style={styles.serviceTitleRow}>
                                     <Text style={styles.serviceName}>{service.name}</Text>
-                                    {service.popular && (
+                                    {service.isPopular && (
                                         <View style={styles.popularBadge}>
                                             <Text style={styles.popularText}>⭐ Popular</Text>
                                         </View>
                                     )}
                                 </View>
-                                <Text style={styles.serviceCategory}>{service.category}</Text>
+                                <Text style={styles.serviceCategory}>{service.category?.name}</Text>
 
                                 <View style={styles.serviceDetails}>
                                     <Text style={styles.detailText}>⏱️ {service.duration} mins</Text>
                                 </View>
 
                                 <View style={styles.priceRow}>
-                                    {service.discount ? (
+                                    {service.discountPrice ? (
                                         <>
                                             <Text style={styles.originalPrice}>{formatPrice(service.price)}</Text>
-                                            <Text style={styles.discountPrice}>{formatPrice(service.discount)}</Text>
+                                            <Text style={styles.discountPrice}>{formatPrice(service.discountPrice)}</Text>
                                             <View style={styles.saveBadge}>
                                                 <Text style={styles.saveText}>
-                                                    Save {Math.round(((service.price - service.discount) / service.price) * 100)}%
+                                                    Save {Math.round(((service.price - service.discountPrice) / service.price) * 100)}%
                                                 </Text>
                                             </View>
                                         </>
@@ -134,7 +167,10 @@ export default function ServicesTab() {
                                     )}
                                 </View>
 
-                                <TouchableOpacity style={styles.bookButton}>
+                                <TouchableOpacity
+                                    style={styles.bookButton}
+                                    onPress={() => router.push('/book')}
+                                >
                                     <Text style={styles.bookButtonText}>Book Now</Text>
                                 </TouchableOpacity>
                             </View>

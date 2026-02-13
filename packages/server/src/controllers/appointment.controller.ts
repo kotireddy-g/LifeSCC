@@ -231,6 +231,9 @@ export const createAppointment = async (req: AuthRequest, res: Response) => {
             return sendErrorResponse(res, 'This time slot is already booked', HTTP_STATUS.CONFLICT);
         }
 
+        // Calculate total price (use discount price if available, otherwise regular price)
+        const totalPrice = service.discountPrice || service.price;
+
         // Create appointment
         const appointment = await prisma.appointment.create({
             data: {
@@ -243,6 +246,7 @@ export const createAppointment = async (req: AuthRequest, res: Response) => {
                 serviceId,
                 branchId,
                 notes,
+                totalPrice,
                 status: 'PENDING'
             },
             include: {

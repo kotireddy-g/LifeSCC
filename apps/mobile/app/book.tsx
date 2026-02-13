@@ -1,7 +1,9 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
-import { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { apiService } from '../lib/api';
+import { useAuth } from '../lib/AuthContext';
 
 // Types
 interface Service {
@@ -21,24 +23,47 @@ interface Branch {
 
 export default function BookAppointmentScreen() {
     const router = useRouter();
+    const { user } = useAuth();
     const [step, setStep] = useState(1);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
+    const [services, setServices] = useState<Service[]>([]);
+    const [branches, setBranches] = useState<Branch[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [booking, setBooking] = useState(false);
 
-    // Mock data
-    const services: Service[] = [
-        { id: '1', name: 'Ultrasound Cavitation', price: 5000, duration: 60, description: 'Non-invasive fat reduction' },
-        { id: '2', name: 'Hair Regrowth Therapy', price: 4000, duration: 45, description: 'Advanced hair treatment' },
-        { id: '3', name: 'Laser Hair Removal', price: 3000, duration: 30, description: 'Permanent hair removal' },
-    ];
+    useEffect(() => {
+        fetchServices();
+        fetchBranches();
+    }, []);
 
-    const branches: Branch[] = [
-        { id: '1', name: 'Jubilee Hills', address: 'Road No. 36', city: 'Hyderabad' },
-        { id: '2', name: 'Banjara Hills', address: 'Road No. 12', city: 'Hyderabad' },
-        { id: '3', name: 'Kukatpally', address: 'KPHB Colony', city: 'Hyderabad' },
-    ];
+    const fetchServices = async () => {
+        try {
+            setLoading(true);
+            const response = await apiService.getServices();
+            // API returns { success: true, data: { services: [...], pagination: {...} } }
+            const servicesData = response.data?.data?.services || response.data?.services || [];
+            setServices(Array.isArray(servicesData) ? servicesData : []);
+        } catch (error) {
+            console.error('Failed to fetch services:', error);
+            Alert.alert('Error', 'Failed to load services');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchBranches = async () => {
+        try {
+            const response = await apiService.getBranches();
+            // API returns { success: true, data: { branches: [...], pagination: {...} } }
+            const branchesData = response.data?.data?.branches || response.data?.branches || [];
+            setBranches(Array.isArray(branchesData) ? branchesData : []);
+        } catch (error) {
+            console.error('Failed to fetch branches:', error);
+        }
+    };
 
     const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
 
@@ -55,9 +80,37 @@ export default function BookAppointmentScreen() {
     };
 
     const handleBookAppointment = async () => {
-        // TODO: API integration
-        alert(`Appointment booked!\nService: ${selectedService?.name}\nBranch: ${selectedBranch?.name}\nDate: ${selectedDate}\nTime: ${selectedTime}`);
-        router.push('/(tabs)/appointments');
+        if (!selectedService || !selectedBranch || !selectedDate || !selectedTime) {
+            Alert.alert('Error', 'Please complete all fields');
+            return;
+        }
+
+        if (!user) {
+            Alert.alert('Error', 'You must be logged in to book an appointment');
+            return;
+        }
+
+        try {
+            setBooking(true);
+            const patientName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+            await apiService.createAppointment({
+                serviceId: selectedService.id,
+                branchId: selectedBranch.id,
+                appointmentDate: selectedDate,
+                timeSlot: selectedTime,
+                patientName: patientName,
+                patientPhone: user.phone || '',
+                patientEmail: user.email
+            });
+            Alert.alert('Success', 'Appointment booked successfully!');
+            router.push('/(tabs)/appointments');
+        } catch (error: any) {
+            console.error('Booking error:', error);
+            const errorMessage = error.message || error.error || 'Failed to book appointment';
+            Alert.alert('Error', errorMessage);
+        } finally {
+            setBooking(false);
+        }
     };
 
     return (

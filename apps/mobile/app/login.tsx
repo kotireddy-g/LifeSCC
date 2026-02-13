@@ -1,32 +1,29 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useAuth } from '../lib/AuthContext';
 
 export default function LoginScreen() {
     const router = useRouter();
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
-            alert('Please fill in all fields');
+            Alert.alert('Error', 'Please fill in all fields');
             return;
         }
 
         setLoading(true);
         try {
-            // TODO: Integrate with API
-            // const response = await authService.login({ email, password });
-
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
+            await login(email, password);
             // Navigate to main tabs
             router.replace('/(tabs)');
-        } catch (error) {
-            alert('Login failed. Please try again.');
+        } catch (error: any) {
+            Alert.alert('Login Failed', error.message || 'Please check your credentials and try again.');
         } finally {
             setLoading(false);
         }

@@ -1,75 +1,126 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { apiService } from '../../lib/api';
+
+interface Appointment {
+    id: string;
+    service: { name: string };
+    branch: { name: string; city: string };
+    appointmentDate: string;
+    timeSlot: string;
+    totalPrice: number;
+    status: string;
+}
 
 export default function AppointmentsTab() {
     const [selectedFilter, setSelectedFilter] = useState('All');
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const filters = ['All', 'Upcoming', 'Past', 'Cancelled'];
 
-    const appointments = [
-        {
-            id: '1',
-            service: 'Weight Loss Program',
-            branch: 'Jubilee Hills, Hyderabad',
-            date: 'Feb 15, 2026',
-            time: '10:00 AM',
-            price: 12000,
-            status: 'Confirmed',
-            isPast: false
-        },
-        {
-            id: '2',
-            service: 'Skin Rejuvenation',
-            branch: 'Banjara Hills, Hyderabad',
-            date: 'Feb 18, 2026',
-            time: '2:30 PM',
-            price: 8000,
-            status: 'Pending',
-            isPast: false
-        },
-        {
-            id: '3',
-            service: 'Hair Restoration',
-            branch: 'Kukatpally, Hyderabad',
-            date: 'Jan 10, 2026',
-            time: '11:00 AM',
-            price: 18000,
-            status: 'Completed',
-            isPast: true
-        },
-        {
-            id: '4',
-            service: 'Laser Hair Removal',
-            branch: 'MVP Colony, Vizag',
-            date: 'Dec 20, 2025',
-            time: '3:00 PM',
-            price: 5000,
-            status: 'Cancelled',
-            isPast: true
+    useEffect(() => {
+        fetchAppointments();
+    }, []);
+
+    const fetchAppointments = async () => {
+        try {
+            setError(null);
+            const response = await apiService.getMyAppointments();
+            // API returns { success: true, data: [...] }
+            // Extract the data array properly
+            const appointmentsData = response.data?.data || response.data || [];
+            setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
+        } catch (err: any) {
+            setError(err.message || 'Failed to load appointments');
+            setAppointments([]); // Set empty array on error
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
-    ];
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchAppointments();
+    };
+
+    const handleCancelAppointment = (id: string) => {
+        Alert.alert(
+            'Cancel Appointment',
+            'Are you sure you want to cancel this appointment?',
+            [
+                { text: 'No', style: 'cancel' },
+                {
+                    text: 'Yes, Cancel',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await apiService.cancelAppointment(id, 'User requested cancellation');
+                            Alert.alert('Success', 'Appointment cancelled successfully');
+                            fetchAppointments();
+                        } catch (err: any) {
+                            Alert.alert('Error', err.message || 'Failed to cancel appointment');
+                        }
+                    }
+                }
+            ]
+        );
+    };
 
     const filteredAppointments = appointments.filter(apt => {
+        const isPast = new Date(apt.appointmentDate) < new Date();
         if (selectedFilter === 'All') return true;
-        if (selectedFilter === 'Upcoming') return !apt.isPast && apt.status !== 'Cancelled';
-        if (selectedFilter === 'Past') return apt.isPast && apt.status !== 'Cancelled';
-        if (selectedFilter === 'Cancelled') return apt.status === 'Cancelled';
+        if (selectedFilter === 'Upcoming') return !isPast && apt.status !== 'CANCELLED';
+        if (selectedFilter === 'Past') return isPast && apt.status !== 'CANCELLED';
+        if (selectedFilter === 'Cancelled') return apt.status === 'CANCELLED';
         return true;
     });
 
     const getStatusStyle = (status: string) => {
-        switch (status) {
-            case 'Confirmed': return styles.statusConfirmed;
-            case 'Pending': return styles.statusPending;
-            case 'Completed': return styles.statusCompleted;
-            case 'Cancelled': return styles.statusCancelled;
+        switch (status.toUpperCase()) {
+            case 'CONFIRMED': return styles.statusConfirmed;
+            case 'PENDING': return styles.statusPending;
+            case 'COMPLETED': return styles.statusCompleted;
+            case 'CANCELLED': return styles.statusCancelled;
             default: return styles.statusPending;
         }
     };
 
-    const formatPrice = (price: number) => {
-        return `₹${price.toLocaleString('en-IN')}`;
+    const formatPrice = (price: number | undefined) => {
+        return `₹${(price || 0).toLocaleString('en-IN')}`;
     };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#8B5CF6" />
+                <Text style={{ marginTop: 16, color: '#6b7280' }}>Loading appointments...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+                <Text style={{ fontSize: 48, marginBottom: 16 }}>❌</Text>
+                <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 8 }}>Failed to Load Appointments</Text>
+                <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>{error}</Text>
+                <TouchableOpacity
+                    style={{ backgroundColor: '#8B5CF6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
+                    onPress={fetchAppointments}
+                >
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -95,7 +146,13 @@ export default function AppointmentsTab() {
             </ScrollView>
 
             {/* Appointments List */}
-            <ScrollView style={styles.appointmentsList} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                style={styles.appointmentsList}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#8B5CF6']} />
+                }
+            >
                 {filteredAppointments.length === 0 ? (
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyIcon}>📅</Text>
@@ -110,7 +167,7 @@ export default function AppointmentsTab() {
                     filteredAppointments.map((apt) => (
                         <View key={apt.id} style={styles.appointmentCard}>
                             <View style={styles.cardHeader}>
-                                <Text style={styles.serviceName}>{apt.service}</Text>
+                                <Text style={styles.serviceName}>{apt.service.name}</Text>
                                 <View style={[styles.statusBadge, getStatusStyle(apt.status)]}>
                                     <Text style={styles.statusText}>{apt.status}</Text>
                                 </View>
@@ -118,26 +175,29 @@ export default function AppointmentsTab() {
 
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailIcon}>📍</Text>
-                                <Text style={styles.detailText}>{apt.branch}</Text>
+                                <Text style={styles.detailText}>{apt.branch.name}, {apt.branch.city}</Text>
                             </View>
 
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailIcon}>📅</Text>
-                                <Text style={styles.detailText}>{apt.date} at {apt.time}</Text>
+                                <Text style={styles.detailText}>{formatDate(apt.appointmentDate)} at {apt.timeSlot}</Text>
                             </View>
 
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailIcon}>💰</Text>
-                                <Text style={styles.priceText}>{formatPrice(apt.price)}</Text>
+                                <Text style={styles.priceText}>{formatPrice(apt.totalPrice)}</Text>
                             </View>
 
                             {/* Actions */}
-                            {apt.status === 'Confirmed' || apt.status === 'Pending' ? (
+                            {apt.status === 'CONFIRMED' || apt.status === 'PENDING' ? (
                                 <View style={styles.actions}>
                                     <TouchableOpacity style={styles.actionButtonSecondary}>
                                         <Text style={styles.actionButtonSecondaryText}>Reschedule</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.actionButtonDanger}>
+                                    <TouchableOpacity
+                                        style={styles.actionButtonDanger}
+                                        onPress={() => handleCancelAppointment(apt.id)}
+                                    >
                                         <Text style={styles.actionButtonDangerText}>Cancel</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -156,13 +216,13 @@ export default function AppointmentsTab() {
                     </View>
                     <View style={styles.summaryCard}>
                         <Text style={styles.summaryValue}>
-                            {appointments.filter(a => !a.isPast && a.status !== 'Cancelled').length}
+                            {appointments.filter(a => new Date(a.appointmentDate) >= new Date() && a.status !== 'CANCELLED').length}
                         </Text>
                         <Text style={styles.summaryLabel}>Upcoming</Text>
                     </View>
                     <View style={styles.summaryCard}>
                         <Text style={styles.summaryValue}>
-                            {appointments.filter(a => a.status === 'Completed').length}
+                            {appointments.filter(a => a.status === 'COMPLETED').length}
                         </Text>
                         <Text style={styles.summaryLabel}>Completed</Text>
                     </View>

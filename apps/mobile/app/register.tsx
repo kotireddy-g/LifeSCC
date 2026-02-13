@@ -1,10 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useAuth } from '../lib/AuthContext';
 
 export default function RegisterScreen() {
     const router = useRouter();
+    const { register } = useAuth();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -24,32 +26,37 @@ export default function RegisterScreen() {
     const handleRegister = async () => {
         // Validation
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password) {
-            alert('Please fill in all required fields');
+            Alert.alert('Error', 'Please fill in all required fields');
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            alert('Passwords do not match');
+            Alert.alert('Error', 'Passwords do not match');
             return;
         }
 
         if (formData.password.length < 6) {
-            alert('Password must be at least 6 characters');
+            Alert.alert('Error', 'Password must be at least 6 characters');
             return;
         }
 
         setLoading(true);
         try {
-            // TODO: Integrate with API
-            // const response = await authService.register(formData);
+            await register({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                dateOfBirth: formData.dateOfBirth || undefined,
+                gender: formData.gender,
+            });
 
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            alert('Registration successful! Please login.');
-            router.push('/login');
-        } catch (error) {
-            alert('Registration failed. Please try again.');
+            Alert.alert('Success', 'Registration successful! Please login.', [
+                { text: 'OK', onPress: () => router.push('/login') }
+            ]);
+        } catch (error: any) {
+            Alert.alert('Registration Failed', error.message || 'Please try again.');
         } finally {
             setLoading(false);
         }
