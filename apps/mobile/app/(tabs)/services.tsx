@@ -1,7 +1,9 @@
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { apiService } from '../../lib/api';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/theme';
 
 interface Service {
     id: string;
@@ -17,6 +19,7 @@ interface Service {
     isPopular?: boolean;
     description?: string;
     shortDesc?: string;
+    image?: string;
 }
 
 export default function ServicesTab() {
@@ -69,8 +72,8 @@ export default function ServicesTab() {
     if (loading) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
-                <Text style={{ marginTop: 16, color: '#6b7280' }}>Loading services...</Text>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+                <Text style={{ marginTop: 16, color: COLORS.textLight }}>Loading services...</Text>
             </View>
         );
     }
@@ -78,14 +81,14 @@ export default function ServicesTab() {
     if (error) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-                <Text style={{ fontSize: 48, marginBottom: 16 }}>❌</Text>
-                <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 8 }}>Failed to Load Services</Text>
-                <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>{error}</Text>
+                <Ionicons name="alert-circle-outline" size={64} color={COLORS.error} />
+                <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.text, marginTop: 16, marginBottom: 8 }}>Failed to Load Services</Text>
+                <Text style={{ fontSize: 14, color: COLORS.textLight, textAlign: 'center', marginBottom: 24 }}>{error}</Text>
                 <TouchableOpacity
-                    style={{ backgroundColor: '#8B5CF6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
+                    style={{ backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
                     onPress={fetchServices}
                 >
-                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Retry</Text>
+                    <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>Retry</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -95,12 +98,16 @@ export default function ServicesTab() {
         <View style={styles.container}>
             {/* Search */}
             <View style={styles.searchSection}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search services..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                />
+                <View style={styles.searchContainer}>
+                    <Ionicons name="search-outline" size={20} color={COLORS.textMuted} style={styles.searchIcon} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search services..."
+                        placeholderTextColor={COLORS.textMuted}
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                </View>
             </View>
 
             {/* Categories */}
@@ -129,26 +136,44 @@ export default function ServicesTab() {
                 style={styles.servicesList}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#8B5CF6']} />
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
                 }
             >
                 {filteredServices.map((service) => (
                     <TouchableOpacity key={service.id} style={styles.serviceCard}>
-                        <View style={styles.serviceHeader}>
-                            <Text style={styles.serviceIcon}>✨</Text>
+                        <View style={styles.serviceContent}>
+                            {/* Service Image */}
+                            <View style={styles.imageContainer}>
+                                {service.image ? (
+                                    <Image
+                                        source={{ uri: service.image }}
+                                        style={styles.serviceImage}
+                                        resizeMode="cover"
+                                    />
+                                ) : (
+                                    <View style={styles.placeholderImage}>
+                                        <Ionicons name="medical-outline" size={32} color={COLORS.primary} />
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Service Info */}
                             <View style={styles.serviceInfo}>
                                 <View style={styles.serviceTitleRow}>
-                                    <Text style={styles.serviceName}>{service.name}</Text>
+                                    <Text style={styles.serviceName} numberOfLines={1}>{service.name}</Text>
                                     {service.isPopular && (
                                         <View style={styles.popularBadge}>
-                                            <Text style={styles.popularText}>⭐ Popular</Text>
+                                            <Ionicons name="star" size={12} color={COLORS.warning} />
+                                            <Text style={styles.popularText}>Popular</Text>
                                         </View>
                                     )}
                                 </View>
+
                                 <Text style={styles.serviceCategory}>{service.category?.name}</Text>
 
                                 <View style={styles.serviceDetails}>
-                                    <Text style={styles.detailText}>⏱️ {service.duration} mins</Text>
+                                    <Ionicons name="time-outline" size={14} color={COLORS.textLight} />
+                                    <Text style={styles.detailText}>{service.duration} mins</Text>
                                 </View>
 
                                 <View style={styles.priceRow}>
@@ -185,67 +210,99 @@ export default function ServicesTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb'
+        backgroundColor: COLORS.backgroundGray
     },
     searchSection: {
         padding: 16,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb'
+        borderBottomColor: COLORS.border
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.backgroundLight,
+        borderRadius: 12,
+        paddingHorizontal: 12
+    },
+    searchIcon: {
+        marginRight: 8
     },
     searchInput: {
-        backgroundColor: '#f3f4f6',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16
+        flex: 1,
+        paddingVertical: 12,
+        fontSize: 16,
+        color: COLORS.text
     },
     categories: {
         flexGrow: 0,
-        backgroundColor: 'white',
-        paddingHorizontal: 16,
+        maxHeight: 60,
+        backgroundColor: COLORS.white,
         paddingVertical: 12,
+        paddingHorizontal: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb'
+        borderBottomColor: COLORS.border
     },
     categoryChip: {
         paddingHorizontal: 16,
         paddingVertical: 8,
+        height: 36,
         borderRadius: 20,
-        backgroundColor: '#f3f4f6',
-        marginRight: 8
+        marginRight: 8,
+        backgroundColor: COLORS.backgroundLight,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     categoryChipActive: {
-        backgroundColor: '#8B5CF6'
+        backgroundColor: COLORS.primary,
+        borderColor: COLORS.primary
     },
     categoryText: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#6b7280'
+        fontWeight: '500',
+        color: COLORS.text
     },
     categoryTextActive: {
-        color: 'white'
+        color: COLORS.white
     },
     servicesList: {
         flex: 1,
-        padding: 16
+        paddingHorizontal: 16,
+        paddingTop: 16
     },
     serviceCard: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        marginBottom: 16,
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2
+        shadowRadius: 4,
+        elevation: 3
     },
-    serviceHeader: {
-        flexDirection: 'row'
+    serviceContent: {
+        flexDirection: 'row',
+        padding: 12
     },
-    serviceIcon: {
-        fontSize: 40,
+    imageContainer: {
+        width: 80,
+        height: 80,
         marginRight: 12
+    },
+    serviceImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8
+    },
+    placeholderImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+        backgroundColor: `${COLORS.primary}15`,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     serviceInfo: {
         flex: 1
@@ -253,77 +310,85 @@ const styles = StyleSheet.create({
     serviceTitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4
+        marginBottom: 4,
+        gap: 8
     },
     serviceName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '600',
-        color: '#1f2937',
+        color: COLORS.text,
         flex: 1
     },
     popularBadge: {
-        backgroundColor: '#fef3c7',
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FEF3C7',
         paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 4
+        borderRadius: 12,
+        gap: 4
     },
     popularText: {
-        fontSize: 11,
-        color: '#92400e'
+        fontSize: 10,
+        fontWeight: '600',
+        color: '#92400E'
     },
     serviceCategory: {
-        fontSize: 14,
-        color: '#8B5CF6',
-        marginBottom: 8
+        fontSize: 12,
+        color: COLORS.primary,
+        marginBottom: 6
     },
     serviceDetails: {
-        marginBottom: 8
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+        gap: 4
     },
     detailText: {
-        fontSize: 14,
-        color: '#6b7280'
+        fontSize: 12,
+        color: COLORS.textLight
     },
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12
+        marginBottom: 8,
+        gap: 8
     },
     price: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#8B5CF6'
+        color: COLORS.primary
     },
     originalPrice: {
         fontSize: 14,
-        color: '#9ca3af',
-        textDecorationLine: 'line-through',
-        marginRight: 8
+        color: COLORS.textMuted,
+        textDecorationLine: 'line-through'
     },
     discountPrice: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#8B5CF6',
-        marginRight: 8
+        color: COLORS.primary
     },
     saveBadge: {
-        backgroundColor: '#dcfce7',
-        paddingHorizontal: 6,
+        backgroundColor: '#D1FAE5',
+        paddingHorizontal: 8,
         paddingVertical: 2,
-        borderRadius: 4
+        borderRadius: 12
     },
     saveText: {
-        fontSize: 11,
-        color: '#166534',
-        fontWeight: '600'
+        fontSize: 10,
+        fontWeight: '600',
+        color: '#065F46'
     },
     bookButton: {
-        backgroundColor: '#8B5CF6',
-        paddingVertical: 10,
+        backgroundColor: COLORS.primary,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
         borderRadius: 8,
-        alignItems: 'center'
+        alignSelf: 'flex-start'
     },
     bookButtonText: {
-        color: 'white',
+        color: COLORS.white,
         fontSize: 14,
         fontWeight: '600'
     }

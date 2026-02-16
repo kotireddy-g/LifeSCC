@@ -1,8 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../lib/AuthContext';
 import { apiService } from '../../lib/api';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/theme';
 
 interface Appointment {
     id: string;
@@ -15,7 +17,7 @@ interface Appointment {
 
 export default function HomeTab() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -54,19 +56,38 @@ export default function HomeTab() {
         }
     };
 
-    const statsDisplay = [
-        { label: 'Total Appointments', value: stats.total.toString(), icon: '📅' },
-        { label: 'Upcoming', value: stats.upcoming.toString(), icon: '🔔' },
-        { label: 'Completed', value: stats.completed.toString(), icon: '✅' },
-        { label: 'Services', value: stats.services, icon: '💆' }
+    // Admin stats and actions
+    const adminStatsDisplay = [
+        { label: 'Total Appointments', value: stats.total.toString(), icon: 'calendar-outline', color: COLORS.primary },
+        { label: 'Pending', value: stats.upcoming.toString(), icon: 'time-outline', color: COLORS.warning },
+        { label: 'Completed', value: stats.completed.toString(), icon: 'checkmark-circle-outline', color: COLORS.success },
+        { label: 'Patients', value: '0', icon: 'people-outline', color: COLORS.info }
     ];
 
-    const quickActions = [
-        { title: 'Book Appointment', icon: '📅', color: '#8B5CF6', route: '/book' },
-        { title: 'My Appointments', icon: '📋', color: '#EC4899', route: '/(tabs)/appointments' },
-        { title: 'Browse Services', icon: '✨', color: '#06B6D4', route: '/(tabs)/services' },
-        { title: 'My Profile', icon: '👤', color: '#10B981', route: '/(tabs)/profile' }
+    const adminQuickActions = [
+        { title: 'Manage Appointments', icon: 'calendar', route: '/(tabs)/appointments' },
+        { title: 'View Services', icon: 'grid', route: '/(tabs)/services' },
+        { title: 'Settings', icon: 'settings', route: '/(tabs)/profile' },
+        { title: 'Reports', icon: 'stats-chart', route: '/(tabs)/profile' }
     ];
+
+    // Patient stats and actions
+    const patientStatsDisplay = [
+        { label: 'Total Appointments', value: stats.total.toString(), icon: 'calendar-outline', color: COLORS.primary },
+        { label: 'Upcoming', value: stats.upcoming.toString(), icon: 'time-outline', color: COLORS.info },
+        { label: 'Completed', value: stats.completed.toString(), icon: 'checkmark-circle-outline', color: COLORS.success },
+        { label: 'Services', value: stats.services, icon: 'medical-outline', color: COLORS.warning }
+    ];
+
+    const patientQuickActions = [
+        { title: 'Book Appointment', icon: 'calendar', route: '/book' },
+        { title: 'My Appointments', icon: 'list', route: '/(tabs)/appointments' },
+        { title: 'Browse Services', icon: 'grid', route: '/(tabs)/services' },
+        { title: 'My Profile', icon: 'person', route: '/(tabs)/profile' }
+    ];
+
+    const statsDisplay = isAdmin ? adminStatsDisplay : patientStatsDisplay;
+    const quickActions = isAdmin ? adminQuickActions : patientQuickActions;
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -79,17 +100,22 @@ export default function HomeTab() {
     if (loading) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
+                <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
     }
 
     return (
         <ScrollView style={styles.container}>
-            {/* Header */}
+            {/* Header with Logo */}
             <View style={styles.header}>
-                <View>
-                    <Text style={styles.greeting}>Welcome back! 👋</Text>
+                <Image
+                    source={{ uri: 'https://www.lifescc.com/img/main-logo1.png' }}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
+                <View style={styles.userInfo}>
+                    <Text style={styles.greeting}>Welcome back{isAdmin ? ', Admin' : ''}!</Text>
                     <Text style={styles.name}>{user?.firstName} {user?.lastName}</Text>
                 </View>
             </View>
@@ -98,7 +124,9 @@ export default function HomeTab() {
             <View style={styles.statsGrid}>
                 {statsDisplay.map((stat, index) => (
                     <View key={index} style={styles.statCard}>
-                        <Text style={styles.statIcon}>{stat.icon}</Text>
+                        <View style={[styles.iconContainer, { backgroundColor: `${stat.color}15` }]}>
+                            <Ionicons name={stat.icon as any} size={24} color={stat.color} />
+                        </View>
                         <Text style={styles.statValue}>{stat.value}</Text>
                         <Text style={styles.statLabel}>{stat.label}</Text>
                     </View>
@@ -112,10 +140,12 @@ export default function HomeTab() {
                     {quickActions.map((action, index) => (
                         <TouchableOpacity
                             key={index}
-                            style={[styles.actionCard, { backgroundColor: action.color }]}
+                            style={styles.actionCard}
                             onPress={() => router.push(action.route as any)}
                         >
-                            <Text style={styles.actionIcon}>{action.icon}</Text>
+                            <View style={styles.actionIconContainer}>
+                                <Ionicons name={action.icon as any} size={24} color={COLORS.primary} />
+                            </View>
                             <Text style={styles.actionTitle}>{action.title}</Text>
                         </TouchableOpacity>
                     ))}
@@ -123,45 +153,72 @@ export default function HomeTab() {
             </View>
 
             {/* Upcoming Appointments */}
-            <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
-                    <TouchableOpacity onPress={() => router.push('/(tabs)/appointments')}>
-                        <Text style={styles.seeAll}>See All →</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {upcomingAppointments.length === 0 ? (
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyIcon}>📅</Text>
-                        <Text style={styles.emptyText}>No upcoming appointments</Text>
-                        <TouchableOpacity
-                            style={styles.bookButton}
-                            onPress={() => router.push('/book')}
-                        >
-                            <Text style={styles.bookButtonText}>Book Now</Text>
+            {!isAdmin && (
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
+                        <TouchableOpacity onPress={() => router.push('/(tabs)/appointments')}>
+                            <Text style={styles.seeAll}>See All →</Text>
                         </TouchableOpacity>
                     </View>
-                ) : (
-                    upcomingAppointments.map((appointment) => (
-                        <View key={appointment.id} style={styles.appointmentCard}>
-                            <View style={styles.appointmentHeader}>
-                                <Text style={styles.serviceName}>{appointment.service.name}</Text>
-                                <View style={[
-                                    styles.statusBadge,
-                                    appointment.status === 'CONFIRMED' ? styles.statusConfirmed : styles.statusPending
-                                ]}>
-                                    <Text style={styles.statusText}>{appointment.status}</Text>
+
+                    {upcomingAppointments.length === 0 ? (
+                        <View style={styles.emptyState}>
+                            <View style={styles.emptyIconContainer}>
+                                <Ionicons name="calendar-outline" size={48} color={COLORS.textMuted} />
+                            </View>
+                            <Text style={styles.emptyText}>No upcoming appointments</Text>
+                            <TouchableOpacity
+                                style={styles.bookButton}
+                                onPress={() => router.push('/book')}
+                            >
+                                <Text style={styles.bookButtonText}>Book Now</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        upcomingAppointments.map((appointment) => (
+                            <View key={appointment.id} style={styles.appointmentCard}>
+                                <View style={styles.appointmentHeader}>
+                                    <Text style={styles.serviceName}>{appointment.service.name}</Text>
+                                    <View style={[
+                                        styles.statusBadge,
+                                        appointment.status === 'CONFIRMED' ? styles.statusConfirmed : styles.statusPending
+                                    ]}>
+                                        <Text style={[
+                                            styles.statusText,
+                                            appointment.status === 'CONFIRMED' ? styles.statusConfirmedText : styles.statusPendingText
+                                        ]}>{appointment.status}</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.appointmentDetail}>
+                                    <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
+                                    <Text style={styles.detailText}>{appointment.branch.name}</Text>
+                                </View>
+                                <View style={styles.appointmentDetail}>
+                                    <Ionicons name="calendar-outline" size={16} color={COLORS.textLight} />
+                                    <Text style={styles.detailText}>
+                                        {formatDate(appointment.appointmentDate)} at {appointment.timeSlot}
+                                    </Text>
                                 </View>
                             </View>
-                            <Text style={styles.branchName}>📍 {appointment.branch.name}</Text>
-                            <Text style={styles.dateTime}>
-                                📅 {formatDate(appointment.appointmentDate)} at {appointment.timeSlot}
-                            </Text>
-                        </View>
-                    ))
-                )}
-            </View>
+                        ))
+                    )}
+                </View>
+            )}
+
+            {/* Admin-specific section */}
+            {isAdmin && (
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Admin Dashboard</Text>
+                    <View style={styles.adminInfoCard}>
+                        <Ionicons name="shield-checkmark" size={48} color={COLORS.primary} />
+                        <Text style={styles.adminInfoTitle}>Admin Access</Text>
+                        <Text style={styles.adminInfoText}>
+                            You have administrative privileges. Use the tabs below to manage appointments, services, and view all system data.
+                        </Text>
+                    </View>
+                </View>
+            )}
         </ScrollView>
     );
 }
@@ -169,23 +226,31 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9FAFB'
+        backgroundColor: COLORS.backgroundGray
     },
     header: {
-        backgroundColor: '#8B5CF6',
+        backgroundColor: COLORS.primary,
         padding: 20,
         paddingTop: 60,
         paddingBottom: 30
     },
+    logo: {
+        width: 120,
+        height: 40,
+        marginBottom: 16
+    },
+    userInfo: {
+        marginTop: 8
+    },
     greeting: {
-        fontSize: 16,
-        color: '#E9D5FF',
+        fontSize: 14,
+        color: COLORS.primaryLight,
         marginBottom: 4
     },
     name: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: 'white'
+        color: COLORS.white
     },
     statsGrid: {
         flexDirection: 'row',
@@ -196,29 +261,33 @@ const styles = StyleSheet.create({
     statCard: {
         flex: 1,
         minWidth: '45%',
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2
     },
-    statIcon: {
-        fontSize: 32,
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 8
     },
     statValue: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1F2937',
+        color: COLORS.text,
         marginBottom: 4
     },
     statLabel: {
         fontSize: 12,
-        color: '#6B7280',
+        color: COLORS.textLight,
         textAlign: 'center'
     },
     section: {
@@ -227,7 +296,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#1F2937',
+        color: COLORS.text,
         marginBottom: 16
     },
     sectionHeader: {
@@ -238,7 +307,7 @@ const styles = StyleSheet.create({
     },
     seeAll: {
         fontSize: 14,
-        color: '#8B5CF6',
+        color: COLORS.primary,
         fontWeight: '600'
     },
     actionsGrid: {
@@ -249,31 +318,39 @@ const styles = StyleSheet.create({
     actionCard: {
         flex: 1,
         minWidth: '45%',
+        backgroundColor: COLORS.white,
         padding: 20,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 3
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: COLORS.border
     },
-    actionIcon: {
-        fontSize: 32,
-        marginBottom: 8
+    actionIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: `${COLORS.primary}15`,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 12
     },
     actionTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: 'white',
+        color: COLORS.text,
         textAlign: 'center'
     },
     appointmentCard: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
@@ -283,12 +360,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 12
     },
     serviceName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1F2937',
+        color: COLORS.text,
         flex: 1
     },
     statusBadge: {
@@ -304,42 +381,71 @@ const styles = StyleSheet.create({
     },
     statusText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: '600'
+    },
+    statusConfirmedText: {
         color: '#065F46'
     },
-    branchName: {
-        fontSize: 14,
-        color: '#6B7280',
-        marginBottom: 4
+    statusPendingText: {
+        color: '#92400E'
     },
-    dateTime: {
+    appointmentDetail: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+        gap: 8
+    },
+    detailText: {
         fontSize: 14,
-        color: '#6B7280'
+        color: COLORS.textLight
     },
     emptyState: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         padding: 32,
         borderRadius: 12,
         alignItems: 'center'
     },
-    emptyIcon: {
-        fontSize: 48,
+    emptyIconContainer: {
         marginBottom: 12
     },
     emptyText: {
         fontSize: 16,
-        color: '#6B7280',
+        color: COLORS.textLight,
         marginBottom: 16
     },
     bookButton: {
-        backgroundColor: '#8B5CF6',
+        backgroundColor: COLORS.primary,
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 8
     },
     bookButtonText: {
-        color: 'white',
+        color: COLORS.white,
         fontSize: 16,
         fontWeight: '600'
+    },
+    adminInfoCard: {
+        backgroundColor: COLORS.white,
+        padding: 24,
+        borderRadius: 12,
+        alignItems: 'center',
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3
+    },
+    adminInfoTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.text,
+        marginTop: 12,
+        marginBottom: 8
+    },
+    adminInfoText: {
+        fontSize: 14,
+        color: COLORS.textLight,
+        textAlign: 'center',
+        lineHeight: 20
     }
 });

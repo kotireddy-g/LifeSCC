@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../lib/AuthContext';
 import { apiService } from '../../lib/api';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/theme';
 
 export default function ProfileTab() {
     const router = useRouter();
@@ -54,7 +56,7 @@ export default function ProfileTab() {
     if (!user) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
+                <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
         );
     }
@@ -66,14 +68,14 @@ export default function ProfileTab() {
     ];
 
     const menuItems = [
-        { icon: '👤', label: 'Personal Information', action: 'edit-profile' },
-        { icon: '🔔', label: 'Notifications', action: 'notifications' },
-        { icon: '❤️', label: 'Favorites', action: 'favorites' },
-        { icon: '📋', label: 'Appointment History', action: 'history' },
-        { icon: '💳', label: 'Payment Methods', action: 'payments' },
-        { icon: '📍', label: 'Clinic Locations', action: 'locations' },
-        { icon: '❓', label: 'Help & Support', action: 'support' },
-        { icon: '⚙️', label: 'Settings', action: 'settings' }
+        { icon: 'person-outline', label: 'Personal Information', action: 'edit-profile' },
+        { icon: 'notifications-outline', label: 'Notifications', action: 'notifications' },
+        { icon: 'heart-outline', label: 'Favorites', action: 'favorites' },
+        { icon: 'document-text-outline', label: 'Appointment History', action: 'history' },
+        { icon: 'card-outline', label: 'Payment Methods', action: 'payments' },
+        { icon: 'location-outline', label: 'Clinic Locations', action: 'locations' },
+        { icon: 'help-circle-outline', label: 'Help & Support', action: 'support' },
+        { icon: 'settings-outline', label: 'Settings', action: 'settings' }
     ];
 
     return (
@@ -89,6 +91,7 @@ export default function ProfileTab() {
                 <Text style={styles.email}>{user.email}</Text>
                 <Text style={styles.phone}>{user.phone || 'No phone number'}</Text>
                 <View style={styles.memberBadge}>
+                    <Ionicons name="time-outline" size={14} color={COLORS.textLight} />
                     <Text style={styles.memberText}>Member since {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</Text>
                 </View>
             </View>
@@ -107,15 +110,18 @@ export default function ProfileTab() {
             <View style={styles.menuSection}>
                 {menuItems.map((item, index) => (
                     <TouchableOpacity key={index} style={styles.menuItem}>
-                        <Text style={styles.menuIcon}>{item.icon}</Text>
+                        <View style={styles.menuIconContainer}>
+                            <Ionicons name={item.icon as any} size={20} color={COLORS.primary} />
+                        </View>
                         <Text style={styles.menuLabel}>{item.label}</Text>
-                        <Text style={styles.menuArrow}>›</Text>
+                        <Ionicons name="chevron-forward" size={20} color={COLORS.textMuted} />
                     </TouchableOpacity>
                 ))}
             </View>
 
             {/* Logout Button */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
+                <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
                 <Text style={styles.logoutText}>{loading ? 'Logging out...' : 'Logout'}</Text>
             </TouchableOpacity>
 
@@ -128,21 +134,21 @@ export default function ProfileTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb'
+        backgroundColor: COLORS.backgroundGray
     },
     header: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         alignItems: 'center',
         paddingVertical: 32,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb'
+        borderBottomColor: COLORS.border
     },
     avatar: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#8B5CF6',
+        backgroundColor: COLORS.primary,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16
@@ -150,37 +156,40 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: 'white'
+        color: COLORS.white
     },
     name: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1f2937',
+        color: COLORS.text,
         marginBottom: 4
     },
     email: {
         fontSize: 14,
-        color: '#6b7280',
+        color: COLORS.textLight,
         marginBottom: 4
     },
     phone: {
         fontSize: 14,
-        color: '#6b7280',
+        color: COLORS.textLight,
         marginBottom: 12
     },
     memberBadge: {
-        backgroundColor: '#f3f4f6',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: COLORS.backgroundLight,
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 12
     },
     memberText: {
         fontSize: 12,
-        color: '#6b7280'
+        color: COLORS.textLight
     },
     statsSection: {
         flexDirection: 'row',
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         padding: 16,
         gap: 12
     },
@@ -188,22 +197,22 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingVertical: 12,
-        backgroundColor: '#f9fafb',
+        backgroundColor: COLORS.backgroundGray,
         borderRadius: 8
     },
     statValue: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#8B5CF6',
+        color: COLORS.primary,
         marginBottom: 4
     },
     statLabel: {
         fontSize: 11,
-        color: '#6b7280',
+        color: COLORS.textLight,
         textAlign: 'center'
     },
     menuSection: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         marginTop: 12,
         paddingHorizontal: 20
     },
@@ -212,38 +221,41 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#f3f4f6'
+        borderBottomColor: COLORS.backgroundLight
     },
-    menuIcon: {
-        fontSize: 24,
-        marginRight: 16,
-        width: 32
+    menuIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: `${COLORS.primary}15`,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12
     },
     menuLabel: {
         flex: 1,
         fontSize: 16,
-        color: '#1f2937'
-    },
-    menuArrow: {
-        fontSize: 24,
-        color: '#9ca3af'
+        color: COLORS.text
     },
     logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
         backgroundColor: '#fee2e2',
         marginHorizontal: 20,
         marginTop: 24,
         padding: 16,
-        borderRadius: 8,
-        alignItems: 'center'
+        borderRadius: 8
     },
     logoutText: {
-        color: '#dc2626',
+        color: COLORS.error,
         fontSize: 16,
         fontWeight: '600'
     },
     version: {
         textAlign: 'center',
-        color: '#9ca3af',
+        color: COLORS.textMuted,
         fontSize: 12,
         marginTop: 24,
         marginBottom: 32

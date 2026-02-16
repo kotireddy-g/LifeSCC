@@ -11,7 +11,7 @@ const getApiBaseUrl = () => {
         }
         // For iOS simulator and Android emulator, use localhost
         // For physical devices, use your computer's IP address
-        return 'http://localhost:5000/api';
+        return 'http://192.168.1.127:5000/api';
     }
     return 'https://your-production-api.com/api';
 };

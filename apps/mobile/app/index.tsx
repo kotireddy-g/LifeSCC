@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, Image } from 'react-native';
+import { COLORS } from '../constants/theme';
 
 export default function Index() {
     const router = useRouter();
@@ -9,15 +10,19 @@ export default function Index() {
         // Auto-redirect to login after a short delay
         const timer = setTimeout(() => {
             router.replace('/login');
-        }, 1000);
+        }, 1500);
 
         return () => clearTimeout(timer);
     }, []);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.logo}>LifeSCC</Text>
-            <ActivityIndicator size="large" color="#8B5CF6" style={styles.loader} />
+            <Image
+                source={{ uri: 'https://www.lifescc.com/img/main-logo1.png' }}
+                style={styles.logo}
+                resizeMode="contain"
+            />
+            <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />
             <Text style={styles.text}>Loading...</Text>
         </View>
     );
@@ -26,14 +31,13 @@ export default function Index() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         justifyContent: 'center',
         alignItems: 'center'
     },
     logo: {
-        fontSize: 48,
-        fontWeight: 'bold',
-        color: '#8B5CF6',
+        width: 200,
+        height: 80,
         marginBottom: 30
     },
     loader: {
@@ -41,6 +45,6 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 16,
-        color: '#6b7280'
+        color: COLORS.textLight
     }
 });

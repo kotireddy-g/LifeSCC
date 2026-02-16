@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { apiService } from '../../lib/api';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../constants/theme';
 
 interface Appointment {
     id: string;
@@ -100,8 +102,8 @@ export default function AppointmentsTab() {
     if (loading) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" color="#8B5CF6" />
-                <Text style={{ marginTop: 16, color: '#6b7280' }}>Loading appointments...</Text>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+                <Text style={{ marginTop: 16, color: COLORS.textLight }}>Loading appointments...</Text>
             </View>
         );
     }
@@ -109,14 +111,14 @@ export default function AppointmentsTab() {
     if (error) {
         return (
             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-                <Text style={{ fontSize: 48, marginBottom: 16 }}>❌</Text>
-                <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 8 }}>Failed to Load Appointments</Text>
-                <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>{error}</Text>
+                <Ionicons name="alert-circle-outline" size={64} color={COLORS.error} />
+                <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.text, marginTop: 16, marginBottom: 8 }}>Failed to Load Appointments</Text>
+                <Text style={{ fontSize: 14, color: COLORS.textLight, textAlign: 'center', marginBottom: 24 }}>{error}</Text>
                 <TouchableOpacity
-                    style={{ backgroundColor: '#8B5CF6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
+                    style={{ backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 }}
                     onPress={fetchAppointments}
                 >
-                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Retry</Text>
+                    <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>Retry</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -150,12 +152,12 @@ export default function AppointmentsTab() {
                 style={styles.appointmentsList}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#8B5CF6']} />
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
                 }
             >
                 {filteredAppointments.length === 0 ? (
                     <View style={styles.emptyState}>
-                        <Text style={styles.emptyIcon}>📅</Text>
+                        <Ionicons name="calendar-outline" size={64} color={COLORS.textMuted} />
                         <Text style={styles.emptyTitle}>No appointments found</Text>
                         <Text style={styles.emptyText}>
                             {selectedFilter === 'All'
@@ -174,17 +176,17 @@ export default function AppointmentsTab() {
                             </View>
 
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailIcon}>📍</Text>
+                                <Ionicons name="location-outline" size={16} color={COLORS.textLight} style={styles.detailIcon} />
                                 <Text style={styles.detailText}>{apt.branch.name}, {apt.branch.city}</Text>
                             </View>
 
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailIcon}>📅</Text>
+                                <Ionicons name="calendar-outline" size={16} color={COLORS.textLight} style={styles.detailIcon} />
                                 <Text style={styles.detailText}>{formatDate(apt.appointmentDate)} at {apt.timeSlot}</Text>
                             </View>
 
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailIcon}>💰</Text>
+                                <Ionicons name="cash-outline" size={16} color={COLORS.primary} style={styles.detailIcon} />
                                 <Text style={styles.priceText}>{formatPrice(apt.totalPrice)}</Text>
                             </View>
 
@@ -192,12 +194,14 @@ export default function AppointmentsTab() {
                             {apt.status === 'CONFIRMED' || apt.status === 'PENDING' ? (
                                 <View style={styles.actions}>
                                     <TouchableOpacity style={styles.actionButtonSecondary}>
+                                        <Ionicons name="time-outline" size={16} color={COLORS.text} />
                                         <Text style={styles.actionButtonSecondaryText}>Reschedule</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.actionButtonDanger}
                                         onPress={() => handleCancelAppointment(apt.id)}
                                     >
+                                        <Ionicons name="close-circle-outline" size={16} color={COLORS.error} />
                                         <Text style={styles.actionButtonDangerText}>Cancel</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -235,33 +239,36 @@ export default function AppointmentsTab() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb'
+        backgroundColor: COLORS.backgroundGray
     },
     filters: {
         flexGrow: 0,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb'
+        borderBottomColor: COLORS.border
     },
     filterChip: {
         paddingHorizontal: 16,
         paddingVertical: 8,
+        height: 36,
         borderRadius: 20,
-        backgroundColor: '#f3f4f6',
-        marginRight: 8
+        backgroundColor: COLORS.backgroundLight,
+        marginRight: 8,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     filterChipActive: {
-        backgroundColor: '#8B5CF6'
+        backgroundColor: COLORS.primary
     },
     filterText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#6b7280'
+        color: COLORS.textLight
     },
     filterTextActive: {
-        color: 'white'
+        color: COLORS.white
     },
     appointmentsList: {
         flex: 1,
@@ -272,27 +279,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 60
     },
-    emptyIcon: {
-        fontSize: 64,
-        marginBottom: 16
-    },
     emptyTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#1f2937',
+        color: COLORS.text,
+        marginTop: 16,
         marginBottom: 8
     },
     emptyText: {
         fontSize: 14,
-        color: '#6b7280',
+        color: COLORS.textLight,
         textAlign: 'center'
     },
     appointmentCard: {
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
-        shadowColor: '#000',
+        shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
@@ -307,7 +311,7 @@ const styles = StyleSheet.create({
     serviceName: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#1f2937',
+        color: COLORS.text,
         flex: 1
     },
     statusBadge: {
@@ -330,7 +334,7 @@ const styles = StyleSheet.create({
     statusText: {
         fontSize: 11,
         fontWeight: '600',
-        color: '#1f2937'
+        color: COLORS.text
     },
     detailRow: {
         flexDirection: 'row',
@@ -338,19 +342,18 @@ const styles = StyleSheet.create({
         marginBottom: 8
     },
     detailIcon: {
-        fontSize: 16,
         marginRight: 8,
         width: 24
     },
     detailText: {
         fontSize: 14,
-        color: '#6b7280',
+        color: COLORS.textLight,
         flex: 1
     },
     priceText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#8B5CF6'
+        color: COLORS.primary
     },
     actions: {
         flexDirection: 'row',
@@ -358,39 +361,45 @@ const styles = StyleSheet.create({
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
-        borderTopColor: '#e5e7eb'
+        borderTopColor: COLORS.border
     },
     actionButtonSecondary: {
         flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
         paddingVertical: 8,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#d1d5db',
-        alignItems: 'center'
+        borderColor: COLORS.borderDark
     },
     actionButtonSecondaryText: {
-        color: '#374151',
+        color: COLORS.text,
         fontSize: 14,
         fontWeight: '600'
     },
     actionButtonDanger: {
         flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
         paddingVertical: 8,
         borderRadius: 8,
-        backgroundColor: '#fee2e2',
-        alignItems: 'center'
+        backgroundColor: '#fee2e2'
     },
     actionButtonDangerText: {
-        color: '#dc2626',
+        color: COLORS.error,
         fontSize: 14,
         fontWeight: '600'
     },
     summary: {
         flexDirection: 'row',
-        backgroundColor: 'white',
+        backgroundColor: COLORS.white,
         padding: 16,
         borderTopWidth: 1,
-        borderTopColor: '#e5e7eb',
+        borderTopColor: COLORS.border,
         gap: 12
     },
     summaryCard: {
@@ -400,11 +409,11 @@ const styles = StyleSheet.create({
     summaryValue: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#8B5CF6',
+        color: COLORS.primary,
         marginBottom: 4
     },
     summaryLabel: {
         fontSize: 12,
-        color: '#6b7280'
+        color: COLORS.textLight
     }
 });

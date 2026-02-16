@@ -1,8 +1,9 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '../lib/AuthContext';
+import { COLORS } from '../constants/theme';
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -38,7 +39,11 @@ export default function LoginScreen() {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {/* Logo */}
                 <View style={styles.logoSection}>
-                    <Text style={styles.logo}>LifeSCC</Text>
+                    <Image
+                        source={{ uri: 'https://www.lifescc.com/img/main-logo1.png' }}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
                     <Text style={styles.subtitle}>Welcome Back</Text>
                 </View>
 
@@ -105,7 +110,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: COLORS.white
     },
     scrollContent: {
         flexGrow: 1,
@@ -117,15 +122,14 @@ const styles = StyleSheet.create({
         marginBottom: 40
     },
     logo: {
-        fontSize: 40,
-        fontWeight: 'bold',
-        color: '#8B5CF6',
-        marginBottom: 8
+        width: 180,
+        height: 60,
+        marginBottom: 16
     },
     subtitle: {
         fontSize: 24,
         fontWeight: '600',
-        color: '#1f2937'
+        color: COLORS.text
     },
     form: {
         marginBottom: 24

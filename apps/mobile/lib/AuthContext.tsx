@@ -13,6 +13,8 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
+    isPatient: boolean;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     register: (userData: any) => Promise<void>;
@@ -36,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
             console.error('Auth check failed:', error);
             await apiService.clearToken();
+            setUser(null);
         } finally {
             setLoading(false);
         }
@@ -65,15 +68,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logout = async () => {
         try {
             await apiService.logout();
+            await apiService.clearToken();
             setUser(null);
         } catch (error) {
             console.error('Logout failed:', error);
+            // Clear user even if API call fails
+            await apiService.clearToken();
+            setUser(null);
         }
     };
 
     const value = {
         user,
         isAuthenticated: !!user,
+        isAdmin: user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN',
+        isPatient: user?.role === 'PATIENT',
         loading,
         login,
         register,
